@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
+    public float walkSpeed;
+    public float sprintSpeed;
 
     public float groundDrag;
 
@@ -14,11 +16,9 @@ public class PlayerController : MonoBehaviour
     public float airMultiplier;
     bool readyToJump;
 
-    [HideInInspector] public float walkSpeed;
-    [HideInInspector] public float sprintSpeed;
-
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode sprintKey = KeyCode.LeftShift;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -34,6 +34,15 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
 
+    public MovementState movementState;
+
+    public enum MovementState
+    {
+        walking,
+        sprinting,
+        air
+    }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -47,19 +56,20 @@ public class PlayerController : MonoBehaviour
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
 
-        InputMovement();
-        SpeedControl();
-
         // handle drag
         if (grounded)
             rb.drag = groundDrag;
         else
             rb.drag = 0;
+
+        InputMovement();
+        SpeedControl();
+        HandlingStateMovementAction();
     }
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        PlayerMovement();
     }
 
     private void InputMovement()
@@ -78,7 +88,31 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MovePlayer()
+    private void HandlingStateMovementAction()
+    {
+
+        //sprinting
+        if (grounded && Input.GetKey(sprintKey))
+        {
+            movementState = MovementState.sprinting;
+            moveSpeed = sprintSpeed;
+        }
+
+        //walking
+        else if (grounded)
+        {
+            movementState = MovementState.walking;
+            moveSpeed = walkSpeed;
+        }
+
+        //when in air
+        else
+        {
+            movementState = MovementState.air;
+        }
+    }
+
+    private void PlayerMovement()
     {
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
@@ -94,13 +128,14 @@ public class PlayerController : MonoBehaviour
 
     private void SpeedControl()
     {
-        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        Vector3 flatVelo = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         // limit velocity if needed
-        if (flatVel.magnitude > moveSpeed)
+        if (flatVelo.magnitude > moveSpeed)
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+            //calculate the maximum speed given before if player exceed the maximum speed
+            Vector3 limitedVel = flatVelo.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z); //apply the maximum speed
         }
     }
 

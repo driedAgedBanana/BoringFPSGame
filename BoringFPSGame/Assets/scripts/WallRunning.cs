@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class WallRunning : MonoBehaviour
@@ -9,17 +8,31 @@ public class WallRunning : MonoBehaviour
     public LayerMask whatIsGround;
     public LayerMask whatIsWall;
     public float wallRunForce;
+    public float wallJumpUpForce;
+    public float wallJumpSideForce;
     public float wallClimbSpeed;
     public float wallRunTime;
+    public float maxWallRunningTime;
     private float wallRunTimer;
 
     [Header("Inputs")]
     public KeyCode upwardsKey = KeyCode.LeftShift;
     public KeyCode downwardsKey = KeyCode.LeftControl;
+    public KeyCode wallJumpingKey = KeyCode.Space;
     private bool upwardRunning;
     private bool downwardRunning;
     private float horizontalInput;
     private float verticalInput;
+
+    [Header("Existing Wallrunning State")]
+    private bool existingWall;
+    public float ExitWallTime;
+    private float exitWallTimer;
+    public float offWallPushForce;
+
+    [Header("Gravity")]
+    public bool usingGravity;
+    public float gravityCounteringForce;
 
     [Header("Wall Detection")]
     public float wallCheckDistance;
@@ -31,6 +44,7 @@ public class WallRunning : MonoBehaviour
 
     [Header("References")]
     private PlayerController playerController;
+    public PlayerCam playerCam;
     public Transform Orientation;
     private Rigidbody rb;
 
@@ -78,11 +92,50 @@ public class WallRunning : MonoBehaviour
         downwardRunning = Input.GetKey(downwardsKey);
 
         //state 1 - wallrunning moment
-        if ((WallLeft || WallRight) && verticalInput > 0 && AboveGroundHeightCheck())
+        if ((WallLeft || WallRight) && verticalInput > 0 && AboveGroundHeightCheck() && !existingWall)
         {
             if (!playerController.wallrunning)
             {
                 StartWallRunning();
+            }
+
+            if (wallRunTimer > 0)
+            {
+                wallRunTimer -= Time.deltaTime;
+            }
+
+            if (wallRunTimer <= 0 && playerController.wallrunning)
+            {
+                existingWall = true;
+                exitWallTimer = ExitWallTime;
+
+                // Apply a small force to push the player off the wall
+                Vector3 wallNormal = WallRight ? rightWallHit.normal : leftWallHit.normal;
+                rb.AddForce(wallNormal *offWallPushForce, ForceMode.Impulse); // Adjust the force value as needed
+            }
+
+            if (Input.GetKey(wallJumpingKey))
+            {
+                WallJumping();
+            }
+        }
+
+        //State 2 - existing wall
+        else if (existingWall)
+        {
+            if (playerController.wallrunning)
+            {
+                StopWallRunning();
+            }
+
+            if (ExitWallTime > 0)
+            {
+                exitWallTimer -= Time.deltaTime;
+            }
+
+            if (exitWallTimer <= 0)
+            {
+                existingWall = false;
             }
         }
 
@@ -99,12 +152,27 @@ public class WallRunning : MonoBehaviour
     private void StartWallRunning()
     {
         playerController.wallrunning = true;
+
+        wallRunTimer = maxWallRunningTime;
+
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        //Apply epic camera stuff
+        playerCam.DoFov(90f);
+
+        if (WallLeft)
+        {
+            playerCam.DoTilt(-5f);
+        }
+        if (WallRight)
+        {
+            playerCam.DoTilt(5f);
+        }
     }
 
     private void WallRunningHandlingMovement()
     {
         rb.useGravity = false;
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         Vector3 wallNormal = WallRight ? rightWallHit.normal : leftWallHit.normal;
 
@@ -119,9 +187,9 @@ public class WallRunning : MonoBehaviour
         rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
 
         //upwards/downwards
-        if(upwardRunning)
+        if (upwardRunning)
         {
-            rb.velocity = new Vector3 (rb.velocity.x, wallClimbSpeed, rb.velocity.z);
+            rb.velocity = new Vector3(rb.velocity.x, wallClimbSpeed, rb.velocity.z);
         }
         else if (downwardRunning)
         {
@@ -133,10 +201,36 @@ public class WallRunning : MonoBehaviour
         {
             rb.AddForce(-wallNormal * 100, ForceMode.Force);
         }
+
+        //weaken the gravity
+        if (usingGravity)
+        {
+            rb.AddForce(transform.up * gravityCounteringForce, ForceMode.Force);
+        }
     }
 
     private void StopWallRunning()
     {
         playerController.wallrunning = false;
+
+        //Stop the effect
+        playerCam.DoFov(80f);
+        playerCam.DoTilt(0f);
+    }
+
+    private void WallJumping()
+    {
+        existingWall = usingGravity;
+        exitWallTimer = ExitWallTime;
+
+        Vector3 wallNormal = WallRight ? rightWallHit.normal : leftWallHit.normal;
+
+        Vector3 forceToApply = transform.up * wallJumpUpForce + wallNormal * wallJumpSideForce;
+
+        // Ensure the player doesn't gain an excessive boost
+        Vector3 currentVelocity = rb.velocity;
+        rb.velocity = new Vector3(currentVelocity.x, Mathf.Min(currentVelocity.y, 0), currentVelocity.z);
+
+        rb.AddForce(forceToApply, ForceMode.Impulse);
     }
 }

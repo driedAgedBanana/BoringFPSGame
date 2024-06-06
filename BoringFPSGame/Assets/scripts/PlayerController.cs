@@ -139,6 +139,12 @@ public class PlayerController : MonoBehaviour
             state = MovementState.air;
         }
 
+        //turn the gravity off while on slope
+        if(!wallrunning)
+        {
+            rb.useGravity = !OnSlope();
+        }
+
         // check if desiredMoveSpeed has changed drastically
         if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
         {

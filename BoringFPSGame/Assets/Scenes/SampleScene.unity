@@ -842,6 +842,7 @@ GameObject:
   - component: {fileID: 1408865213}
   - component: {fileID: 1408865215}
   - component: {fileID: 1408865216}
+  - component: {fileID: 1408865217}
   m_Layer: 0
   m_Name: PlayerParent
   m_TagString: Untagged
@@ -908,23 +909,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   orientation: {fileID: 660304678}
-  JumpKey: 32
-  SprintKey: 304
   moveSpeed: 6
-  AirMultiplier: 0.4
+  airMultiplier: 0.4
   walkSpeed: 4
   sprintSpeed: 8
   acceleration: 10
+  jumpForce: 5
+  jumpKey: 32
+  sprintKey: 304
+  groundDrag: 6
+  airDrag: 3
+  groundCheck: {fileID: 141730195}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  groundCheck: {fileID: 141730195}
-  gravityModifier: 2
-  JumpForce: 20
-  groundDrag: 6
-  airDrag: 3
-  rb: {fileID: 1408865213}
-  cameraTransform: {fileID: 963194228}
+  groundDistance: 0.4
 --- !u!114 &1408865216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -937,10 +936,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87c86122ba3ef204f996ba41ef788bff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SenX: 100
-  SenY: 100
-  camera: {fileID: 72423096}
+  wallRun: {fileID: 1408865217}
+  sensX: 100
+  sensY: 100
+  cam: {fileID: 963194228}
   orientation: {fileID: 660304678}
+--- !u!114 &1408865217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408865212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4299d267e38c99d4b80cff2cef624d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orientation: {fileID: 660304678}
+  wallDistance: 1
+  minimumJumpHeight: 1.5
+  wallRunGravity: 1
+  wallRunJumpForce: 6
+  cam: {fileID: 963194227}
+  fov: 90
+  wallRunfov: 110
+  wallRunfovTime: 20
+  camTilt: 20
+  camTiltTime: 20
 --- !u!1 &1624379903
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,7 +978,7 @@ GameObject:
   - component: {fileID: 1624379905}
   m_Layer: 7
   m_Name: Wall
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -969,7 +992,7 @@ Transform:
   m_GameObject: {fileID: 1624379903}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 9.6, z: 21.7}
+  m_LocalPosition: {x: 0, y: 10.1, z: 20.96}
   m_LocalScale: {x: 38.8, y: 9, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1060,7 +1083,7 @@ GameObject:
   - component: {fileID: 1637504144}
   m_Layer: 7
   m_Name: Wall (1)
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

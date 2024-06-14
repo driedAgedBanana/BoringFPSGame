@@ -445,6 +445,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gun_Trigger
       objectReference: {fileID: 0}
+    - target: {fileID: 5879249395849071745, guid: bceefb2a39f6db74d9bc9d006687b7f1, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

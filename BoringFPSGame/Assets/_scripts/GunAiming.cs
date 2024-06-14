@@ -1,58 +1,57 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GunAiming : MonoBehaviour
 {
-    [Header("References")]
-    public Transform Gun;
-    public Transform camera;
+    public Transform gunItSelf;
+    public Transform cam;
     public Transform aimingPosition;
     public Transform originalWeaponPosition;
 
-    [Header("Aiming")]
-    public KeyCode aimKey = KeyCode.Mouse1;
-    public float aimingSpeed = 5;
+    public KeyCode ADSKey = KeyCode.Mouse1;
+    public float aimingSpeed = 2f;
 
-    public Vector3 originalGunPosition;
-    public Quaternion originalGunRotation;
-    [SerializeField] private bool isAming = false;
+    [SerializeField] private bool isAiming = false;
+    [SerializeField] private Image crosshairImage;
+    [SerializeField] private Image ADSCrosshairImage;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        //originalGunPosition = Gun.localPosition;
-        originalGunRotation = Gun.localRotation;
-
-        originalGunRotation = Gun.localRotation;
+        gunItSelf.position = originalWeaponPosition.position;
+        gunItSelf.rotation = originalWeaponPosition.rotation;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        HandleAiming();
+        AimingMoment();
     }
 
-    private void HandleAiming()
+    private void AimingMoment()
     {
-        if (Input.GetKeyDown(aimKey))
+        if (Input.GetKeyDown(ADSKey))
         {
-            isAming = true;
+            isAiming = true;
         }
-        else if (Input.GetKeyUp(aimKey))
+        else if (Input.GetKeyUp(ADSKey))
         {
-            isAming = false;
+            isAiming = false;
         }
 
-        if (isAming)
+        if (isAiming)
         {
-            Gun.position = Vector3.Lerp(Gun.position, aimingPosition.position, Time.deltaTime * aimingSpeed);
-            Gun.rotation = Quaternion.Lerp(Gun.rotation, aimingPosition.rotation, Time.deltaTime * aimingSpeed);
+            gunItSelf.position = Vector3.Lerp(gunItSelf.position, aimingPosition.position, Time.deltaTime * aimingSpeed);
+            gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, aimingPosition.rotation, Time.deltaTime * aimingSpeed);
+            crosshairImage.gameObject.SetActive(false);
+            ADSCrosshairImage.gameObject.SetActive(true);
         }
         else
         {
-            Gun.position = Vector3.Lerp(Gun.position, originalGunPosition, Time.deltaTime * aimingSpeed);
-            Gun.rotation = Quaternion.Lerp(Gun.rotation, originalGunRotation, Time.deltaTime * aimingSpeed);
+            gunItSelf.position = Vector3.Lerp(gunItSelf.position, originalWeaponPosition.position, Time.deltaTime * aimingSpeed);
+            gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, originalWeaponPosition.rotation, Time.deltaTime * aimingSpeed);
+            crosshairImage.gameObject.SetActive(true);
+            ADSCrosshairImage.gameObject.SetActive(false);
         }
     }
 }

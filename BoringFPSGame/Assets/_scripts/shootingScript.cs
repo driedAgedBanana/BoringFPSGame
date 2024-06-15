@@ -4,13 +4,22 @@ using UnityEngine;
 
 public class shootingScript : MonoBehaviour
 {
+    //References
+    public GunRecoil gunRecoil;
+
     public KeyCode shootKey = KeyCode.Mouse0;
     public Transform shootingPoint;
     public GameObject bullet;
     public float Power;
     [SerializeField] private float bulletTimeAlive = 5f;
 
-    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Transform mainCamera;
+
+    private void Start()
+    {
+        mainCamera = GameObject.FindWithTag("MainCamera").transform;
+        gunRecoil = mainCamera.GetComponent<GunRecoil>();
+    }
 
     private void Update()
     {

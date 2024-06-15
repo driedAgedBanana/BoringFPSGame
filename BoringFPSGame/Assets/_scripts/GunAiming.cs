@@ -15,7 +15,7 @@ public class GunAiming : MonoBehaviour
 
     [SerializeField] private bool isAiming = false;
     [SerializeField] private Image crosshairImage;
-    [SerializeField] private Image ADSCrosshairImage;
+    [SerializeField] private Image ADSCrosshairImage; //probably use it for later on
 
     private void Start()
     {
@@ -44,14 +44,12 @@ public class GunAiming : MonoBehaviour
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, aimingPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, aimingPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(false);
-            ADSCrosshairImage.gameObject.SetActive(true);
         }
         else
         {
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, originalWeaponPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, originalWeaponPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(true);
-            ADSCrosshairImage.gameObject.SetActive(false);
         }
     }
 }

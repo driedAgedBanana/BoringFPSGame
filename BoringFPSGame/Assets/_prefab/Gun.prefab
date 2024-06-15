@@ -317,6 +317,8 @@ MonoBehaviour:
   shootingPoint: {fileID: 0}
   bullet: {fileID: 0}
   Power: 0
+  bulletTimeAlive: 5
+  mainCamera: {fileID: 0}
 --- !u!1 &3832703582600972130
 GameObject:
   m_ObjectHideFlags: 0

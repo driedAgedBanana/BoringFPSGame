@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -9,9 +10,15 @@ public class PlayerMovementScript : MonoBehaviour
     [SerializeField] Transform orientation;
 
     [Header("Movement")]
-    [SerializeField] float moveSpeed = 6f;
-    [SerializeField] float airMultiplier = 0.4f;
+    [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float airMultiplier = 0.4f;
     float movementMultiplier = 10f;
+
+    [Header("Leaning")]
+    private Quaternion initialRotation;
+    public float amt, slerpAMT;
+    [SerializeField] private KeyCode leanLeft = KeyCode.Q;
+    [SerializeField] private KeyCode leanRight = KeyCode.E;
 
     [Header("Sprinting")]
     [SerializeField] float walkSpeed = 4f;
@@ -45,26 +52,12 @@ public class PlayerMovementScript : MonoBehaviour
 
     RaycastHit slopeHit;
 
-    private bool OnSlope()
-    {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight / 2 + 0.5f))
-        {
-            if (slopeHit.normal != Vector3.up)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        return false;
-    }
-
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        initialRotation = transform.localRotation;
     }
 
     private void Update()
@@ -74,6 +67,7 @@ public class PlayerMovementScript : MonoBehaviour
         MyInput();
         ControlDrag();
         ControlSpeed();
+        LeaningMoment();
 
         if (Input.GetKeyDown(jumpKey) && isGrounded)
         {
@@ -124,6 +118,22 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
+    private bool OnSlope()
+    {
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight / 2 + 0.5f))
+        {
+            if (slopeHit.normal != Vector3.up)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+
     private void FixedUpdate()
     {
         MovePlayer();
@@ -142,6 +152,25 @@ public class PlayerMovementScript : MonoBehaviour
         else if (!isGrounded)
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
+        }
+    }
+
+    void LeaningMoment()
+    {
+
+        if (Input.GetKey(leanLeft))
+        {
+            Quaternion newLeanRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z + amt);
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, newLeanRotation, Time.deltaTime * slerpAMT);
+        }
+        else if (Input.GetKey(leanRight))
+        {
+            Quaternion newLeanRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z - amt);
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, newLeanRotation, Time.deltaTime * slerpAMT);
+        }
+        else
+        {
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, initialRotation, Time.deltaTime * slerpAMT);
         }
     }
 }

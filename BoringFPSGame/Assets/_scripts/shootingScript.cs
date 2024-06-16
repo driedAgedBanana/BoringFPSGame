@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class shootingScript : MonoBehaviour
 {
+    [SerializeField] private Transform mainCamera;
+    [SerializeField] private Camera cam;
+
     [Header("Inputs")]
     public KeyCode shootKey = KeyCode.Mouse0;
     public KeyCode ADSKey = KeyCode.Mouse1;
@@ -12,7 +15,6 @@ public class shootingScript : MonoBehaviour
     [Header("Aiming Mechanics")]
     public float aimingSpeed = 12f;
     public Transform gunItSelf;
-    public Transform cam;
     public Transform aimingPosition;
     public Transform originalWeaponPosition;
 
@@ -20,13 +22,22 @@ public class shootingScript : MonoBehaviour
     [SerializeField] private Image crosshairImage;
     //[SerializeField] private Image ADSCrosshairImage; //probably use it for later on
 
+    [Header("ADS FOV")]
+    [SerializeField] private float StartFov;
+    [SerializeField] private float ADSFov;
+    [SerializeField] private float ADSFovTime;
+
+    public float AimFOV { get; private set; }
+
     [Header("Shooting Mechanics")]
     public Transform shootingPoint;
     public GameObject bullet;
     public float Power;
     [SerializeField] private float bulletTimeAlive = 5f;
 
-    [SerializeField] private Transform mainCamera;
+    [Header("SFX")]
+    public AudioClip SFX;
+    private AudioSource shootingSFX;
 
     [Header("Recoil")]
     public Transform recoilSlot;
@@ -44,12 +55,22 @@ public class shootingScript : MonoBehaviour
 
     private void Start()
     {
-
         mainCamera = GameObject.FindWithTag("MainCamera").transform;
         //gunRecoil = mainCamera.GetComponent<GunRecoil>();
 
         gunItSelf.position = originalWeaponPosition.position;
         gunItSelf.rotation = originalWeaponPosition.rotation;
+
+        if (SFX == null)
+        {
+            Debug.Log("You haven't assigned the SFX through the inspector!");
+            this.enabled = false;
+        }
+
+        shootingSFX = GetComponent<AudioSource>();
+        shootingSFX.playOnAwake = false;
+        shootingSFX.clip = SFX;
+        shootingSFX.Stop();
     }
 
     private void Update()
@@ -71,6 +92,7 @@ public class shootingScript : MonoBehaviour
             {
                 shootingPoint.LookAt(mainCamera.position + (mainCamera.forward));
             }
+            shootingSFX.Play();
             ShootingMoment();
         }
     }
@@ -99,6 +121,7 @@ public class shootingScript : MonoBehaviour
             crosshairImage.gameObject.SetActive(true);
         }
     }
+
 
     private void ShootingMoment()
     {

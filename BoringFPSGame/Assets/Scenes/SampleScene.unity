@@ -472,7 +472,7 @@ PrefabInstance:
       objectReference: {fileID: 224546055}
     - target: {fileID: 3308650646713414757, guid: bceefb2a39f6db74d9bc9d006687b7f1, type: 3}
       propertyPath: bulletTimeAlive
-      value: 1.6
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 3308650646713414757, guid: bceefb2a39f6db74d9bc9d006687b7f1, type: 3}
       propertyPath: originalWeaponPosition
@@ -1187,7 +1187,7 @@ Transform:
   m_GameObject: {fileID: 1174712024}
   serializedVersion: 2
   m_LocalRotation: {x: -0.02041482, y: 0.7080983, z: -0.035397634, w: -0.70493054}
-  m_LocalPosition: {x: 0.19408512, y: -0.31092024, z: 0.6519828}
+  m_LocalPosition: {x: 0.19, y: -0.262, z: 0.651}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1494,8 +1494,8 @@ Transform:
   m_GameObject: {fileID: 1624379903}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10.1, z: 20.96}
-  m_LocalScale: {x: 38.8, y: 9, z: 1}
+  m_LocalPosition: {x: 0, y: 10.1, z: 22.6}
+  m_LocalScale: {x: 38.8, y: 9, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 504523912}
@@ -1600,7 +1600,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.7, y: 9.6, z: 17}
-  m_LocalScale: {x: 38.8, y: 9, z: 1}
+  m_LocalScale: {x: 38.55, y: 9, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 504523912}

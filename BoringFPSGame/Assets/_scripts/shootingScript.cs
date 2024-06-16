@@ -59,10 +59,19 @@ public class shootingScript : MonoBehaviour
 
         if (Input.GetKeyDown(shootKey))
         {
-            GameObject bulletItSelf = Instantiate(bullet, shootingPoint.position, transform.rotation);
-            bulletItSelf.GetComponent<Rigidbody>().AddForce(transform.TransformDirection(Vector3.right) * Power, ForceMode.VelocityChange);
-            recoil += 0.1f;
-            Destroy(bulletItSelf, bulletTimeAlive);
+            RaycastHit hit;
+            if(Physics.Raycast(mainCamera.position, mainCamera.forward, out hit))
+            {
+                if (Vector3.Distance(mainCamera.position, hit.point) >1)
+                {
+                    shootingPoint.LookAt(hit.point);
+                }
+            }
+            else
+            {
+                shootingPoint.LookAt(mainCamera.position + (mainCamera.forward));
+            }
+            ShootingMoment();
         }
     }
 
@@ -89,6 +98,14 @@ public class shootingScript : MonoBehaviour
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, originalWeaponPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(true);
         }
+    }
+
+    private void ShootingMoment()
+    {
+        GameObject bulletItSelf = Instantiate(bullet, shootingPoint.position, transform.rotation);
+        bulletItSelf.GetComponent<Rigidbody>().AddForce(transform.TransformDirection(Vector3.right) * Power, ForceMode.VelocityChange);
+        recoil += 0.1f;
+        Destroy(bulletItSelf, bulletTimeAlive);
     }
 
     private void Recoiling()

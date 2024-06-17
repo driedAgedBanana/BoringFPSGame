@@ -9,6 +9,9 @@ public class PlayerMovementScript : MonoBehaviour
 
     [SerializeField] Transform orientation;
 
+    [Header("References")]
+    private WeaponSway WS;
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float airMultiplier = 0.4f;

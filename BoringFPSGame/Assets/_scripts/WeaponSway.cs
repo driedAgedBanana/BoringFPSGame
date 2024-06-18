@@ -8,6 +8,7 @@ public class WeaponSway : MonoBehaviour
     public float Drag = 2.5f;
     public float DragThreshold = -5f;
     public float Smoothness = 5f;
+    public Transform Parent;
 
     private Quaternion localRotation;
     // Start is called before the first frame update
@@ -39,7 +40,9 @@ public class WeaponSway : MonoBehaviour
             z = (z > -DragThreshold) ? -DragThreshold : z;
         }
 
-        Quaternion newRotation = Quaternion.Euler(localRotation.x, localRotation.y + y, localRotation.z + z);
+        Quaternion newRotation = Quaternion.Euler(localRotation.x, localRotation.y + y, Parent.localEulerAngles.z + localRotation.z + z);
         transform.localRotation = Quaternion.Lerp(transform.localRotation, newRotation, (Time.deltaTime * Smoothness));
+
+        
     }
 }

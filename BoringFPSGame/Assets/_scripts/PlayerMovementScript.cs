@@ -1,179 +1,76 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using TreeEditor;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 
 public class PlayerMovementScript : MonoBehaviour
 {
-    float playerHeight = 2f;
-
-    [SerializeField] Transform orientation;
-
-    [Header("References")]
-    private WeaponSway WS;
-
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 6f;
-    [SerializeField] private float airMultiplier = 0.4f;
-    float movementMultiplier = 10f;
-
-    [Header("Leaning")]
-    private Quaternion initialRotation;
-    public float amt, slerpAMT;
-    [SerializeField] private KeyCode leanLeft = KeyCode.Q;
-    [SerializeField] private KeyCode leanRight = KeyCode.E;
-
-    [Header("Sprinting")]
-    [SerializeField] float walkSpeed = 4f;
-    [SerializeField] float sprintSpeed = 6f;
-    [SerializeField] float acceleration = 10f;
-
-    [Header("Jumping")]
-    public float jumpForce = 5f;
-
-    [Header("Keybinds")]
-    [SerializeField] KeyCode jumpKey = KeyCode.Space;
-    [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
-
-    [Header("Drag")]
-    [SerializeField] float groundDrag = 6f;
-    [SerializeField] float airDrag = 2f;
-
-    float horizontalMovement;
-    float verticalMovement;
-
-    [Header("Ground Detection")]
-    [SerializeField] Transform groundCheck;
-    [SerializeField] LayerMask groundMask;
-    [SerializeField] float groundDistance = 0.2f;
-    public bool isGrounded { get; private set; }
-
-    Vector3 moveDirection;
-    Vector3 slopeMoveDirection;
-
+    public float speed = 5f;
+    public float sprintSpeed = 10f;
+    public float jumpForce = 10;
+    public float rotationSpeed = 2;
+    public float leaningAmount = 20f;
+    bool isGrounded = false;
     Rigidbody rb;
-
-    RaycastHit slopeHit;
+    private Camera cam;
+    private float camX;
+    
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+        cam = GetComponentInChildren<Camera>();
 
-        initialRotation = transform.localRotation;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        MyInput();
-        ControlDrag();
-        ControlSpeed();
-        LeaningMoment();
-
-        if (Input.GetKeyDown(jumpKey) && isGrounded)
-        {
-            Jump();
-        }
-
-        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+        Movement();
+        leaningMoment();
+        camMovement();
     }
 
-    void MyInput()
+    private void Movement()
     {
-        horizontalMovement = Input.GetAxisRaw("Horizontal");
-        verticalMovement = Input.GetAxisRaw("Vertical");
+        Vector3 MovementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
-    }
-
-    void Jump()
-    {
-        if (isGrounded)
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
-    void ControlSpeed()
-    {
-        if (Input.GetKey(sprintKey) && isGrounded)
-        {
-            moveSpeed = Mathf.Lerp(moveSpeed, sprintSpeed, acceleration * Time.deltaTime);
+            MovementInput *= sprintSpeed;
         }
         else
         {
-            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed, acceleration * Time.deltaTime);
+            MovementInput *= speed;
+        }
+
+        rb.velocity = transform.forward * MovementInput.z + transform.right * MovementInput.x + transform.up * rb.velocity.y;
+
+        isGrounded = Physics.Raycast(transform.position, -transform.up, 1.3f);
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
     }
 
-    void ControlDrag()
+    private void leaningMoment()
     {
-        if (isGrounded)
-        {
-            rb.drag = groundDrag;
-        }
-        else
-        {
-            rb.drag = airDrag;
-        }
+        float leanInput = Input.GetAxis("Lean Axes");
+        transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, leanInput * leaningAmount);
     }
 
-    private bool OnSlope()
+    private void camMovement()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight / 2 + 0.5f))
-        {
-            if (slopeHit.normal != Vector3.up)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        return false;
-    }
+        transform.Rotate(transform.up * Input.GetAxis("Mouse X") * rotationSpeed);
 
-    private void FixedUpdate()
-    {
-        MovePlayer();
-    }
+        camX -= Input.GetAxis("Mouse Y") * rotationSpeed;
 
-    void MovePlayer()
-    {
-        if (isGrounded && !OnSlope())
-        {
-            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
-        }
-        else if (isGrounded && OnSlope())
-        {
-            rb.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
-        }
-        else if (!isGrounded)
-        {
-            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
-        }
-    }
+        camX = Mathf.Clamp(camX, -90, 90);
 
-    void LeaningMoment()
-    {
-
-        if (Input.GetKey(leanLeft))
-        {
-            Quaternion newLeanRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z + amt);
-            transform.localRotation = Quaternion.Slerp(transform.localRotation, newLeanRotation, Time.deltaTime * slerpAMT);
-        }
-        else if (Input.GetKey(leanRight))
-        {
-            Quaternion newLeanRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z - amt);
-            transform.localRotation = Quaternion.Slerp(transform.localRotation, newLeanRotation, Time.deltaTime * slerpAMT);
-        }
-        else
-        {
-            transform.localRotation = Quaternion.Slerp(transform.localRotation, initialRotation, Time.deltaTime * slerpAMT);
-        }
+        cam.transform.localEulerAngles = new Vector3(camX, 0, 0);
     }
 }

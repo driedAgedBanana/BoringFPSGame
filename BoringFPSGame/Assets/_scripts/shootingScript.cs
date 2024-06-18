@@ -40,9 +40,10 @@ public class shootingScript : MonoBehaviour
     private AudioSource shootingSFX;
 
     [Header("Recoil")]
-    public Transform recoilSlot;
     public GameObject weapon;
     public float recoil = 0.0f;
+    public float maxRecoil = 5f;
+    Vector3 currentRecoil;
 
     [SerializeField] private bool ADSRecoil = false;
 
@@ -76,22 +77,10 @@ public class shootingScript : MonoBehaviour
     private void Update()
     {
         AimingMoment();
-        Recoiling();
+        recoiling();
 
         if (Input.GetKeyDown(shootKey))
         {
-            RaycastHit hit;
-            if(Physics.Raycast(mainCamera.position, mainCamera.forward, out hit))
-            {
-                if (Vector3.Distance(mainCamera.position, hit.point) >1)
-                {
-                    shootingPoint.LookAt(hit.point);
-                }
-            }
-            else
-            {
-                shootingPoint.LookAt(mainCamera.position + (mainCamera.forward));
-            }
             shootingSFX.Play();
             ShootingMoment();
         }
@@ -122,52 +111,20 @@ public class shootingScript : MonoBehaviour
         }
     }
 
-
     private void ShootingMoment()
     {
         GameObject bulletItSelf = Instantiate(bullet, shootingPoint.position, transform.rotation);
-        bulletItSelf.GetComponent<Rigidbody>().AddForce(transform.TransformDirection(Vector3.right) * Power, ForceMode.VelocityChange);
-        recoil += 0.1f;
+        bulletItSelf.GetComponent<Rigidbody>().AddForce(shootingPoint.forward * Power, ForceMode.VelocityChange);
         Destroy(bulletItSelf, bulletTimeAlive);
+
+        currentRecoil = currentRecoil + new Vector3(Random.Range(-recoil, recoil), Random.Range(-recoil, recoil), 0);
     }
 
-    private void Recoiling()
+    private void recoiling()
     {
-        if (recoil > 0)
-        {
-            Quaternion maxRecoil = Quaternion.Euler(0, 0, maxRecoil_z);
-            // Dampen towards the target rotation
-            recoilSlot.localRotation = Quaternion.Slerp(recoilSlot.localRotation, maxRecoil, Time.deltaTime * recoilSpeed);
-            weapon.transform.localEulerAngles = new Vector3(weapon.transform.localEulerAngles.x, weapon.transform.localEulerAngles.y, recoilSlot.localEulerAngles.z);
-            recoil -= Time.deltaTime;
-
-            if (isAiming)
-            {
-                Quaternion ADSmaxRecoil = Quaternion.Euler(0, 0, ADSMaxRecoil_z);
-                // Dampen towards the target rotation
-                recoilSlot.localRotation = Quaternion.Slerp(recoilSlot.localRotation, ADSmaxRecoil, Time.deltaTime * ADSRecoilSpeed);
-                weapon.transform.localEulerAngles = new Vector3(weapon.transform.localEulerAngles.x, weapon.transform.localEulerAngles.y, recoilSlot.localEulerAngles.z);
-                recoil -= Time.deltaTime;
-                ADSRecoil = true;
-            }
-        }
-        else
-        {
-            recoil = 0;
-            Quaternion minRecoil = Quaternion.Euler(0, 0, 0);
-            // Dampen towards the target rotation
-            recoilSlot.localRotation = Quaternion.Slerp(recoilSlot.localRotation, minRecoil, Time.deltaTime * recoilSpeed / 2);
-            weapon.transform.localEulerAngles = new Vector3(weapon.transform.localEulerAngles.x, weapon.transform.localEulerAngles.y, recoilSlot.localEulerAngles.z);
-
-            if (isAiming)
-            {
-                recoil = 0;
-                Quaternion ADSminRecoil = Quaternion.Euler(0, 0, 0);
-                // Dampen towards the target rotation
-                recoilSlot.localRotation = Quaternion.Slerp(recoilSlot.localRotation, ADSminRecoil, Time.deltaTime * ADSRecoilSpeed / 2);
-                weapon.transform.localEulerAngles = new Vector3(weapon.transform.localEulerAngles.x, weapon.transform.localEulerAngles.y, recoilSlot.localEulerAngles.z);
-                ADSRecoil = false;
-            }
-        }
+        transform.localEulerAngles = currentRecoil;
+        currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, Time.deltaTime * 4);
+        
     }
+
 }

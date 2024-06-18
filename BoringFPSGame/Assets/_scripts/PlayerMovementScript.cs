@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TreeEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
 
 public class PlayerMovementScript : MonoBehaviour
@@ -11,7 +12,11 @@ public class PlayerMovementScript : MonoBehaviour
     public float sprintSpeed = 10f;
     public float jumpForce = 10;
     public float rotationSpeed = 2;
+    Quaternion startRotation;
+    public float amt;
+    public float slerpAMT;
     public float leaningAmount = 20f;
+    public float leaningSpeed = 15f;
     bool isGrounded = false;
     Rigidbody rb;
     private Camera cam;
@@ -23,8 +28,10 @@ public class PlayerMovementScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        startRotation = transform.localRotation;
+
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
     }
 
     private void Update()
@@ -32,6 +39,17 @@ public class PlayerMovementScript : MonoBehaviour
         Movement();
         leaningMoment();
         camMovement();
+    }
+
+    private void camMovement()
+    {
+        transform.Rotate(transform.up * Input.GetAxis("Mouse X") * rotationSpeed);
+
+        camX -= Input.GetAxis("Mouse Y") * rotationSpeed;
+
+        camX = Mathf.Clamp(camX, -90, 90);
+
+        cam.transform.localEulerAngles = new Vector3(camX, 0, 0);
     }
 
     private void Movement()
@@ -47,7 +65,8 @@ public class PlayerMovementScript : MonoBehaviour
             MovementInput *= speed;
         }
 
-        rb.velocity = transform.forward * MovementInput.z + transform.right * MovementInput.x + transform.up * rb.velocity.y;
+        Vector3 MoveDir = (transform.forward * MovementInput.z + transform.right * MovementInput.x) / 2;
+        rb.velocity = new Vector3(MoveDir.x, rb.velocity.y, MoveDir.z);
 
         isGrounded = Physics.Raycast(transform.position, -transform.up, 1.3f);
 
@@ -61,16 +80,20 @@ public class PlayerMovementScript : MonoBehaviour
     {
         float leanInput = Input.GetAxis("Lean Axes");
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, leanInput * leaningAmount);
-    }
 
-    private void camMovement()
-    {
-        transform.Rotate(transform.up * Input.GetAxis("Mouse X") * rotationSpeed);
-
-        camX -= Input.GetAxis("Mouse Y") * rotationSpeed;
-
-        camX = Mathf.Clamp(camX, -90, 90);
-
-        cam.transform.localEulerAngles = new Vector3(camX, 0, 0);
+        //if (Input.GetKey(KeyCode.Q))
+        //{
+        //    Quaternion newRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z + amt);
+        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, newRotation, Time.deltaTime * slerpAMT);
+        //}
+        //else if (Input.GetKey(KeyCode.E))
+        //{
+        //    Quaternion newRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z - amt);
+        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, newRotation, Time.deltaTime * slerpAMT);
+        //}
+        //else
+        //{
+        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, startRotation, Time.deltaTime * slerpAMT);
+        //}
     }
 }

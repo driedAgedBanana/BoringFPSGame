@@ -24,6 +24,8 @@ public class PlayerMovementScript : MonoBehaviour
     private float camX;
 
     public GameObject target;
+
+    private bool isClimbing = false;
     
 
     private void Start()
@@ -70,6 +72,13 @@ public class PlayerMovementScript : MonoBehaviour
 
         Vector3 MoveDir = (transform.forward * MovementInput.z + transform.right * MovementInput.x) / 2;
         rb.velocity = new Vector3(MoveDir.x, rb.velocity.y, MoveDir.z);
+
+        //if (isClimbing)
+        //{
+        //    rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+        //    rb.useGravity = false;
+        //}
 
         isGrounded = Physics.Raycast(transform.position, -transform.up, 1.3f);
 

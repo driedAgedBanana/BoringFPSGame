@@ -5,6 +5,7 @@ using TreeEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class PlayerMovementScript : MonoBehaviour
     Rigidbody rb;
     private Camera cam;
     private float camX;
+
+    public GameObject target;
     
 
     private void Start()
@@ -80,6 +83,7 @@ public class PlayerMovementScript : MonoBehaviour
     {
         float leanInput = Input.GetAxis("Lean Axes");
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, leanInput * leaningAmount);
+
 
         //if (Input.GetKey(KeyCode.Q))
         //{

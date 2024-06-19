@@ -102,12 +102,14 @@ public class shootingScript : MonoBehaviour
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, aimingPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, aimingPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(false);
+            ADSRecoil = true;
         }
         else
         {
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, originalWeaponPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, originalWeaponPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(true);
+            ADSRecoil = false;
         }
     }
 

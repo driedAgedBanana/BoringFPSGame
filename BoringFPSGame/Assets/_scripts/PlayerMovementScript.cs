@@ -82,23 +82,23 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
-    //for climbing
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Climbable")
-        {
-            if (isClimbing)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+    ////for climbing
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Climbable")
+    //    {
+    //        if (isClimbing)
+    //        {
+    //            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
-                rb.useGravity = false;
-            }
-            else
-            {
-                rb.useGravity = true;
-            }
-        }
-    }
+    //            rb.useGravity = false;
+    //        }
+    //        else
+    //        {
+    //            rb.useGravity = true;
+    //        }
+    //    }
+    //}
 
     private void leaningMoment()
     {

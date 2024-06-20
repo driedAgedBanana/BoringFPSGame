@@ -13,7 +13,6 @@ public class PlayerMovementScript : MonoBehaviour
     public float sprintSpeed = 10f;
     public float jumpForce = 10;
     public float rotationSpeed = 2;
-    Quaternion startRotation;
     public float amt;
     public float slerpAMT;
     public float leaningAmount = 20f;
@@ -26,7 +25,9 @@ public class PlayerMovementScript : MonoBehaviour
     public GameObject target;
 
     private bool isClimbing = false;
-    
+
+    private Quaternion startRotation;
+    private Quaternion targetLeanRotation;
 
     private void Start()
     {
@@ -34,6 +35,7 @@ public class PlayerMovementScript : MonoBehaviour
         cam = GetComponentInChildren<Camera>();
 
         startRotation = transform.localRotation;
+        targetLeanRotation = startRotation;
 
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         UnityEngine.Cursor.visible = false;
@@ -73,7 +75,6 @@ public class PlayerMovementScript : MonoBehaviour
         Vector3 MoveDir = (transform.forward * MovementInput.z + transform.right * MovementInput.x) / 2;
         rb.velocity = new Vector3(MoveDir.x, rb.velocity.y, MoveDir.z);
 
-
         isGrounded = Physics.Raycast(transform.position, -transform.up, 1.3f);
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
@@ -82,43 +83,23 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
-    ////for climbing
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    if (collision.gameObject.tag == "Climbable")
-    //    {
-    //        if (isClimbing)
-    //        {
-    //            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
-    //            rb.useGravity = false;
-    //        }
-    //        else
-    //        {
-    //            rb.useGravity = true;
-    //        }
-    //    }
-    //}
-
     private void leaningMoment()
     {
         float leanInput = Input.GetAxis("Lean Axes");
-        transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, leanInput * leaningAmount);
 
+        if (leanInput < 0) // Lean right
+        {
+            targetLeanRotation = Quaternion.Euler(0, transform.localEulerAngles.y, -leaningAmount);
+        }
+        else if (leanInput > 0) // Lean left
+        {
+            targetLeanRotation = Quaternion.Euler(0, transform.localEulerAngles.y, leaningAmount);
+        }
+        else // No lean
+        {
+            targetLeanRotation = Quaternion.Euler(0, transform.localEulerAngles.y, 0 * leaningSpeed * Time.deltaTime);
+        }
 
-        //if (Input.GetKey(KeyCode.Q))
-        //{
-        //    Quaternion newRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z + amt);
-        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, newRotation, Time.deltaTime * slerpAMT);
-        //}
-        //else if (Input.GetKey(KeyCode.E))
-        //{
-        //    Quaternion newRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z - amt);
-        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, newRotation, Time.deltaTime * slerpAMT);
-        //}
-        //else
-        //{
-        //    transform.localRotation = Quaternion.Slerp(transform.localRotation, startRotation, Time.deltaTime * slerpAMT);
-        //}
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetLeanRotation, Time.deltaTime * leaningSpeed);
     }
 }

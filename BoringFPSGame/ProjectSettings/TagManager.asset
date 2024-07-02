@@ -8,6 +8,8 @@ TagManager:
   - Wall
   - Bullet
   - Climbable
+  - WeaponCam
+  - Teleport
   layers:
   - Default
   - TransparentFX

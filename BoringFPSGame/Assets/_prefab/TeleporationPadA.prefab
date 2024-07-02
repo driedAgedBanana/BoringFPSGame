@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6913334380247079543}
   m_Layer: 6
   m_Name: TeleporationPadA
-  m_TagString: Untagged
+  m_TagString: Teleport
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,8 +55,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea7321c66461524e953a461b03fe1c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teleporationDestination: {fileID: 1465702634460520933, guid: 2d8a055ccdb801c4bab5480f4f6c1627, type: 3}
-  playerItSelf: {fileID: 3088637151362434091, guid: 70265df28aba6034b892da48cdb819e3, type: 3}
+  playerObj: {fileID: 0}
+  teleporationDestination: {fileID: 0}
 --- !u!23 &6400141575686139431
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -5,36 +5,64 @@ using UnityEngine;
 public class Teleportation : MonoBehaviour
 {
     public GameObject playerObj;
-    public GameObject teleporationDestination;
-    // Start is called before the first frame update
-    void Start()
+    public GameObject teleportationDestination;
+
+    private bool isPlayerInTrigger = false;
+
+    public AudioClip audioSource;
+    private AudioSource teleportingSFX;
+
+    private void Start()
     {
-        
+        if (audioSource == null)
+        {
+            Debug.Log("You haven't assigned the SFX through the inspector!");
+            this.enabled = false;
+        }
+
+        teleportingSFX = GetComponent<AudioSource>();
+        teleportingSFX.playOnAwake = false;
+        teleportingSFX.clip = audioSource;
+        teleportingSFX.Stop();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (isPlayerInTrigger && Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("Player pressed F");
+            if (teleportationDestination != null)
+            {
+                // Debug.Log("Current Player Position: " + playerObj.transform.position);
+                // Debug.Log("Teleportation Destination Position: " + teleportationDestination.transform.position);
+
+                playerObj.transform.position = teleportationDestination.transform.position;
+                teleportingSFX.Play();
+
+                // Debug.Log("Player teleported to: " + playerObj.transform.position);
+            }
+            else
+            {
+                Debug.LogError("Teleportation destination is not assigned.");
+                teleportingSFX.Stop();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == playerObj)
         {
-            if (teleporationDestination != null)
-            {
-                Debug.Log("Current Player Position: " + playerObj.transform.position);
-                Debug.Log("Teleportation Destination Position: " + teleporationDestination.transform.position);
+            isPlayerInTrigger = true;
+        }
+    }
 
-                playerObj.transform.position = teleporationDestination.transform.position;
-
-                Debug.Log("Player teleported to: " + playerObj.transform.position);
-            }
-            else
-            {
-                Debug.LogError("Teleportation destination is not assigned.");
-            }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject == playerObj)
+        {
+            isPlayerInTrigger = false;
         }
     }
 }

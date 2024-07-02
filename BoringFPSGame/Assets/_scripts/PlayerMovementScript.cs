@@ -8,15 +8,21 @@ using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovementScript : MonoBehaviour
 {
+    [Header("Movement Speed")]
     public float speed = 5f;
     public float sprintSpeed = 10f;
+
+    [Header("Jumping")]
     public float jumpForce = 10;
+    bool isGrounded = false;
+
+    [Header("Leaning")]
     public float rotationSpeed = 2;
     public float amt;
     public float slerpAMT;
     public float leaningAmount = 20f;
     public float leaningSpeed = 15f;
-    bool isGrounded = false;
+
     Rigidbody rb;
     private Camera cam;
     private float camX;

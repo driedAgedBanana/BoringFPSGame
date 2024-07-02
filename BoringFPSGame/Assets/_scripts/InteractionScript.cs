@@ -41,8 +41,8 @@ public class InteractionScript : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, rayLength))
         {
-            Transform objectHit = hit.transform; //pure for the debug
-            Debug.Log(objectHit.transform.name);
+            //Transform objectHit = hit.transform; //pure for the debug
+            //Debug.Log(objectHit.transform.name);
 
             if (hit.collider.tag == "Teleport")
             {

@@ -10,6 +10,7 @@ TagManager:
   - Climbable
   - WeaponCam
   - Teleport
+  - Interactable
   layers:
   - Default
   - TransparentFX

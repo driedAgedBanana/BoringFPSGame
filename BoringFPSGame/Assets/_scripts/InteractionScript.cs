@@ -8,13 +8,22 @@ public class InteractionScript : MonoBehaviour
     private Camera _Maincamera;
     [SerializeField] private float rayLength;
 
-    [Header("Interaction UI images")]
-    public Image teleportationIcon;
+    private CapsuleCollider playerCollider;
 
-    // Start is called before the first frame update
-    void Start()
+    [Header("Interaction UI images")]
+    public Image[] interactionIcons;
+
+    private enum interactionIconType
     {
-        teleportationIcon.gameObject.SetActive(false);
+        Interactable, // test
+        Count // must be placed last
+    }
+
+    private void Start()
+    {
+        setAllIconsInactive(); // Ensure all icons are inactive at the start
+
+        playerCollider = GetComponent<CapsuleCollider>();
 
         Camera[] mainCam = GetComponentsInChildren<Camera>();
         foreach (Camera cam in mainCam)
@@ -26,8 +35,7 @@ public class InteractionScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         scanInteraction();
     }
@@ -41,17 +49,68 @@ public class InteractionScript : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, rayLength))
         {
-            //Transform objectHit = hit.transform; //pure for the debug
-            //Debug.Log(objectHit.transform.name);
+            string InteractionTag = hit.collider.tag;
 
-            if (hit.collider.tag == "Teleport")
+            switch (InteractionTag)
             {
-                teleportationIcon.gameObject.SetActive(true);
+                case "Interactable":
+                    SetIconsActive((int)interactionIconType.Interactable);
+                    break;
+
+                // Add more if you want to
+
+                default:
+                    setAllIconsInactive();
+                    break;
             }
-            else
-            {
-                teleportationIcon.gameObject.SetActive(false);
-            }
+        }
+        else
+        {
+            setAllIconsInactive(); // Ensure icons are turned off when nothing is hit
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        string tag = other.gameObject.tag;
+
+        switch (tag)
+        {
+            case "Interactable":
+                SetIconsActive((int)interactionIconType.Interactable);
+                break;
+                // Add more interactions in case you need it
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        string tag = other.gameObject.tag;
+
+        switch (tag)
+        {
+            case "Interactable":
+                // Add more tags if needed
+                setAllIconsInactive();
+                break;
+        }
+    }
+
+    private void SetIconsActive(int index)
+    {
+        setAllIconsInactive();
+
+        if (index >= 0 && index < interactionIcons.Length)
+        {
+            interactionIcons[index].gameObject.SetActive(true);
+        }
+    }
+
+    private void setAllIconsInactive()
+    {
+        foreach (Image icon in interactionIcons)
+        {
+            icon.gameObject.SetActive(false);
         }
     }
 }

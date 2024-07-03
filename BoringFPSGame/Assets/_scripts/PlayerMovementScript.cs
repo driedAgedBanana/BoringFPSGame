@@ -1,10 +1,7 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.UIElements.Experimental;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UI;
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -23,9 +20,25 @@ public class PlayerMovementScript : MonoBehaviour
     public float leaningAmount = 20f;
     public float leaningSpeed = 15f;
 
+    [Header("Special for teleportation icon")]
+    public Image teleportationIcon;
+
+    //[Header("Crouching and Sliding Manager")]
+    //public float crouchSpeed = 3f;
+    //public float slideSpeed = 20f;
+
+    //private bool isSliding = false;
+    //private Vector3 slideDirection;
+    //[SerializeField] private float slidingTimer = 0f;
+    //public float MaxSlidingTimer = 2.5f;
+    //private float originalHeight;
+    //public float crouchHeight = 1f;
+
     Rigidbody rb;
     private Camera cam;
     private float camX;
+
+    private CapsuleCollider playerCollider;
 
     public GameObject target;
 
@@ -36,14 +49,19 @@ public class PlayerMovementScript : MonoBehaviour
 
     private void Start()
     {
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
+
         rb = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
+        playerCollider = GetComponentInChildren<CapsuleCollider>();
 
         startRotation = transform.localRotation;
         targetLeanRotation = startRotation;
 
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        UnityEngine.Cursor.visible = false;
+        //teleportationIcon.gameObject.SetActive(false);
+
+        //originalHeight = GetComponent<Collider>().bounds.size.y;
     }
 
     private void Update()
@@ -106,5 +124,21 @@ public class PlayerMovementScript : MonoBehaviour
         }
 
         transform.localRotation = Quaternion.Slerp(transform.localRotation, targetLeanRotation, Time.deltaTime * leaningSpeed);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("Teleport"))
+        {
+            teleportationIcon.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Teleport"))
+        {
+            teleportationIcon.gameObject.SetActive(false);
+        }
     }
 }

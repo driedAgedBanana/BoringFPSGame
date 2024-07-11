@@ -20,7 +20,9 @@ public class EnemyScript : MonoBehaviour
     public float wanderSpeed = 2f;
     public float chasingSpeed = 8f;
     public float range = 2.1f;
-    public float rotationSpeed = 2f; // Adjust this for smoother/slower rotations
+    public float rotationSpeed = 2f;
+
+    [SerializeField] private float rayLength = 2f;
 
     private Vector3 wanderDirection;
     private Quaternion targetRotation;
@@ -84,21 +86,23 @@ public class EnemyScript : MonoBehaviour
 
         Vector3 rayOrigin = transform.position + Vector3.up * 0.2f; // Adjust if necessary to start from the middle of the enemy
         Vector3 rayDirection = wanderDirection;
-        float rayLength = 2f;
 
         Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
 
         // Check if the enemy hits a wall
-        if (Physics.Raycast(rayOrigin, rayDirection, rayLength))
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit HitInfo, rayLength))
         {
-            Debug.Log("Enemy hit a wall!");
+            if (HitInfo.collider.CompareTag("Wall") || (HitInfo.collider.CompareTag("Barrier")))
+            {
+                Debug.Log("Enemy hit a wall!");
 
-            // Rotate to a new random direction
-            wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-            targetRotation = Quaternion.LookRotation(wanderDirection);
+                // Rotate to a new random direction
+                wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+                targetRotation = Quaternion.LookRotation(wanderDirection);
 
-            // Reset the timer so it doesn't immediately change direction again
-            wanderTimer = 0f;
+                // Reset the timer so it doesn't immediately change direction again
+                wanderTimer = 0f;
+            }
         }
 
         // Smoothly rotate towards the target rotation
@@ -115,5 +119,13 @@ public class EnemyScript : MonoBehaviour
         Vector3 targetDirection = target.position - transform.position;
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("Wall"))
+        {
+
+        }
     }
 }

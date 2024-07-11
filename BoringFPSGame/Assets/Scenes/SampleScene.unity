@@ -360,7 +360,7 @@ GameObject:
   - component: {fileID: 432408853}
   m_Layer: 7
   m_Name: Cube (2)
-  m_TagString: Wall
+  m_TagString: Barrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2061,7 +2061,7 @@ MonoBehaviour:
   wanderSpeed: 2
   chasingSpeed: 5.5
   range: 4.13
-  rotationSpeed: 6
+  rotationSpeed: 9
   wanderTimer: 0
   changeDirectionInterval: 4.5
 --- !u!33 &1280562541
@@ -2081,7 +2081,7 @@ Transform:
   m_GameObject: {fileID: 1280562537}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.21933535, z: 0, w: 0.9756496}
-  m_LocalPosition: {x: 2.49, y: 1, z: -34.65}
+  m_LocalPosition: {x: 2.49, y: 1, z: -35.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2129,7 +2129,7 @@ GameObject:
   - component: {fileID: 1282375176}
   m_Layer: 7
   m_Name: Cube (3)
-  m_TagString: Wall
+  m_TagString: Barrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

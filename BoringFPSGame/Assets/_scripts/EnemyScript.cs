@@ -1,7 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public enum EnemyState
+public enum enemyState
 {
     Wander,
     Follow,
@@ -11,54 +12,57 @@ public enum EnemyState
 public class EnemyScript : MonoBehaviour
 {
     GameObject player;
-    public EnemyState currentState = EnemyState.Wander;
+    public enemyState currentState = enemyState.Wander;
 
     public Transform target;
     private Rigidbody enemyRB;
 
-    public float moveSpeed = 2f;
+    public float wanderSpeed = 2f;
+    public float chasingSpeed = 8f;
     public float range = 2.1f;
+    public float rotationSpeed = 2f; // Adjust this for smoother/slower rotations
 
     private Vector3 wanderDirection;
-    private float wanderTimer = 0f;
-    public float changeDirectionInterval = 3f; // Change direction every 3 seconds
-
-    Ray ray;
+    private Quaternion targetRotation;
+    [SerializeField] private float wanderTimer;
+    [SerializeField] private float changeDirectionInterval = 3f; // Adjust as needed
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         enemyRB = GetComponent<Rigidbody>();
         target = player.transform;
-        StartCoroutine(WanderRoutine());
+
+        wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+        targetRotation = Quaternion.LookRotation(wanderDirection);
     }
 
     void Update()
-    { 
+    {
         switch (currentState)
         {
-            case EnemyState.Wander:
+            case enemyState.Wander:
                 Wandering();
                 break;
-            case EnemyState.Follow:
+            case enemyState.Follow:
                 Following();
                 break;
-            case EnemyState.Die:
+            case enemyState.Die:
                 // No die yet :(
                 break;
         }
 
-        if (IsPlayerInRange(range) && currentState != EnemyState.Die)
+        if (isPlayerInRange(range) && currentState != enemyState.Die)
         {
-            currentState = EnemyState.Follow;
+            currentState = enemyState.Follow;
         }
-        else if (!IsPlayerInRange(range) && currentState != EnemyState.Die)
+        else if (!isPlayerInRange(range) && currentState != enemyState.Die)
         {
-            currentState = EnemyState.Wander;
+            currentState = enemyState.Wander;
         }
     }
 
-    private bool IsPlayerInRange(float range)
+    private bool isPlayerInRange(float range)
     {
         return Vector3.Distance(transform.position, player.transform.position) <= range;
     }
@@ -70,13 +74,15 @@ public class EnemyScript : MonoBehaviour
         {
             // Choose a new random direction
             wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+            targetRotation = Quaternion.LookRotation(wanderDirection);
             wanderTimer = 0f; // Reset the timer
         }
 
         // Move in the current wander direction
-        enemyRB.velocity = wanderDirection * moveSpeed;
+        Vector3 horizontalVelocity = wanderDirection * wanderSpeed;
+        enemyRB.velocity = new Vector3(horizontalVelocity.x, enemyRB.velocity.y, horizontalVelocity.z);
 
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.1f; // Adjust if necessary to start from the middle of the enemy
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.2f; // Adjust if necessary to start from the middle of the enemy
         Vector3 rayDirection = wanderDirection;
         float rayLength = 2f;
 
@@ -89,32 +95,25 @@ public class EnemyScript : MonoBehaviour
 
             // Rotate to a new random direction
             wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-
-            // Optionally, you can also change the enemy's rotation to face the new direction
-            transform.rotation = Quaternion.LookRotation(wanderDirection);
+            targetRotation = Quaternion.LookRotation(wanderDirection);
 
             // Reset the timer so it doesn't immediately change direction again
             wanderTimer = 0f;
         }
+
+        // Smoothly rotate towards the target rotation
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 
     private void Following()
     {
         Vector3 direction = (target.position - transform.position).normalized;
-        enemyRB.velocity = new Vector3(direction.x * moveSpeed, enemyRB.velocity.y, direction.z * moveSpeed);
+        Vector3 horizontalVelocity = new Vector3(direction.x * chasingSpeed, enemyRB.velocity.y, direction.z * chasingSpeed);
+        enemyRB.velocity = horizontalVelocity;
 
-        // Facing the player
+        // Smoothly rotate to face the player
         Vector3 targetDirection = target.position - transform.position;
-        Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, moveSpeed * Time.deltaTime, 0.0f);
-        transform.rotation = Quaternion.LookRotation(newDirection);
-    }
-
-    private IEnumerator WanderRoutine()
-    {
-        while (true)
-        {
-            wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-            yield return new WaitForSeconds(changeDirectionInterval);
-        }
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 }

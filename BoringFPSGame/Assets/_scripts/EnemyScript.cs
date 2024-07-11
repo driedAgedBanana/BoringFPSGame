@@ -69,6 +69,12 @@ public class EnemyScript : MonoBehaviour
         return Vector3.Distance(transform.position, player.transform.position) <= range;
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, range);
+    }
+
     private void Wandering()
     {
         wanderTimer += Time.deltaTime;

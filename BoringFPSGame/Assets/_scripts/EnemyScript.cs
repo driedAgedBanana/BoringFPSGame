@@ -19,13 +19,17 @@ public class EnemyScript : MonoBehaviour
 
     public float wanderSpeed = 2f;
     public float chasingSpeed = 8f;
-    public float range = 2.1f;
+    //public float range = 2.1f;
     public float rotationSpeed = 2f;
+
+    private float distance;
+    public float viewingAngle = 45f;
 
     [SerializeField] private float rayLength = 2f;
 
     private Vector3 wanderDirection;
     private Quaternion targetRotation;
+    private bool canSeePlayer = false;
     [SerializeField] private float wanderTimer;
     [SerializeField] private float changeDirectionInterval = 3f; // Adjust as needed
 
@@ -41,6 +45,26 @@ public class EnemyScript : MonoBehaviour
 
     void Update()
     {
+        // Update the distance to the player
+        distance = Vector3.Distance(transform.position, player.transform.position);
+
+        // Check if the enemy can see the player
+        Vector3 targetDirection = target.transform.position - transform.position;
+        float angle = Vector3.Angle(targetDirection, transform.forward);
+        Debug.DrawRay(transform.position, targetDirection, Color.green);
+        //Debug.Log(distance);
+
+        if (angle <= viewingAngle && distance < 6)
+        {
+            canSeePlayer = true;
+            print("Enemy sees player");
+        }
+        else
+        {
+            canSeePlayer = false;
+        }
+
+        // Switch states based on the enemy's current state and player visibility
         switch (currentState)
         {
             case enemyState.Wander:
@@ -54,25 +78,16 @@ public class EnemyScript : MonoBehaviour
                 break;
         }
 
-        if (isPlayerInRange(range) && currentState != enemyState.Die)
+        if (canSeePlayer && currentState != enemyState.Die)
         {
+            Debug.Log("Enemy switch to chasing state");
             currentState = enemyState.Follow;
         }
-        else if (!isPlayerInRange(range) && currentState != enemyState.Die)
+        else if (!canSeePlayer && currentState != enemyState.Die)
         {
+            Debug.Log("Enemy switch to wandering state");
             currentState = enemyState.Wander;
         }
-    }
-
-    private bool isPlayerInRange(float range)
-    {
-        return Vector3.Distance(transform.position, player.transform.position) <= range;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, range);
     }
 
     private void Wandering()
@@ -96,11 +111,11 @@ public class EnemyScript : MonoBehaviour
         Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
 
         // Check if the enemy hits a wall
-        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit HitInfo, rayLength))
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, rayLength))
         {
-            if (HitInfo.collider.CompareTag("Wall") || (HitInfo.collider.CompareTag("Barrier")))
+            if (hitInfo.collider.CompareTag("Wall") || hitInfo.collider.CompareTag("Barrier"))
             {
-                Debug.Log("Enemy hit a wall!");
+                //Debug.Log("Enemy hit a wall!");
 
                 // Rotate to a new random direction
                 wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
@@ -125,13 +140,5 @@ public class EnemyScript : MonoBehaviour
         Vector3 targetDirection = target.position - transform.position;
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.CompareTag("Wall"))
-        {
-
-        }
     }
 }

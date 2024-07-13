@@ -1157,13 +1157,13 @@ GameObject:
   m_Component:
   - component: {fileID: 857367000}
   - component: {fileID: 857366999}
+  - component: {fileID: 857367002}
   - component: {fileID: 857366998}
   - component: {fileID: 857366997}
   - component: {fileID: 857367005}
   - component: {fileID: 857367001}
   - component: {fileID: 857367004}
   - component: {fileID: 857367003}
-  - component: {fileID: 857367002}
   m_Layer: 0
   m_Name: PlayerObj
   m_TagString: Player
@@ -1302,6 +1302,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 7
   sprintSpeed: 15
+  crouchSpeed: 5
+  crouchHeight: 0.5
+  crouchCamPosOffset: 0.5
   jumpForce: 8
   rotationSpeed: 5
   amt: 7.2
@@ -2058,10 +2061,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   target: {fileID: 857367000}
-  wanderSpeed: 2
+  wanderSpeed: 2.5
   chasingSpeed: 5.5
-  range: 4.13
   rotationSpeed: 9
+  viewingAngle: 50
+  rayLength: 2
   wanderTimer: 0
   changeDirectionInterval: 4.5
 --- !u!33 &1280562541
@@ -3386,7 +3390,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 8d73e465003f201408e28850a2768b9d, type: 3}
     - target: {fileID: 1285937112475591824, guid: e64d5e6313cf61a4ca9048f2fc7043ef, type: 3}
       propertyPath: BouncingForce
-      value: 10
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 1465702634460520933, guid: e64d5e6313cf61a4ca9048f2fc7043ef, type: 3}
       propertyPath: m_Name

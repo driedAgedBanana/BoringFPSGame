@@ -8,6 +8,16 @@ public class PlayerMovementScript : MonoBehaviour
     [Header("Movement Speed")]
     public float speed = 5f;
     public float sprintSpeed = 10f;
+    public float crouchSpeed = 2.5f;
+
+    [Header("Crouching")]
+    public float crouchHeight = 1f;
+    private bool isCrouching = false;
+    private Vector3 originalCamPos;
+    [SerializeField] private float crouchCamPosOffset = 0.5f;
+    private float originalHeight;
+    private float crouchTransitionSpeed = 5f; // Speed of transition
+    private Coroutine crouchRoutine;
 
     [Header("Jumping")]
     public float jumpForce = 10;
@@ -22,17 +32,6 @@ public class PlayerMovementScript : MonoBehaviour
 
     [Header("Special for teleportation icon")]
     public Image teleportationIcon;
-
-    //[Header("Crouching and Sliding Manager")]
-    //public float crouchSpeed = 3f;
-    //public float slideSpeed = 20f;
-
-    //private bool isSliding = false;
-    //private Vector3 slideDirection;
-    //[SerializeField] private float slidingTimer = 0f;
-    //public float MaxSlidingTimer = 2.5f;
-    //private float originalHeight;
-    //public float crouchHeight = 1f;
 
     Rigidbody rb;
     private Camera cam;
@@ -59,9 +58,10 @@ public class PlayerMovementScript : MonoBehaviour
         startRotation = transform.localRotation;
         targetLeanRotation = startRotation;
 
-        //teleportationIcon.gameObject.SetActive(false);
+        originalHeight = playerCollider.height;
+        originalCamPos = cam.transform.localPosition;
 
-        //originalHeight = GetComponent<Collider>().bounds.size.y;
+        //teleportationIcon.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -69,6 +69,7 @@ public class PlayerMovementScript : MonoBehaviour
         Movement();
         leaningMoment();
         camMovement();
+        HandleCrouch();
     }
 
     private void camMovement()
@@ -86,9 +87,20 @@ public class PlayerMovementScript : MonoBehaviour
     {
         Vector3 MovementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && !isCrouching)
         {
             MovementInput *= sprintSpeed;
+        }
+        else if (Input.GetKey(KeyCode.LeftShift) && isCrouching)
+        {
+            isCrouching = false;
+            MovementInput *= sprintSpeed;
+            if (crouchRoutine != null) StopCoroutine(crouchRoutine);
+            crouchRoutine = StartCoroutine(SmoothStandUp());
+        }
+        else if (isCrouching)
+        {
+            MovementInput *= crouchSpeed;
         }
         else
         {
@@ -100,10 +112,66 @@ public class PlayerMovementScript : MonoBehaviour
 
         isGrounded = Physics.Raycast(transform.position, -transform.up, 1.3f);
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isCrouching)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
+    }
+
+    private void HandleCrouch()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (isCrouching)
+            {
+                if (crouchRoutine != null) StopCoroutine(crouchRoutine);
+                crouchRoutine = StartCoroutine(SmoothStandUp());
+            }
+            else
+            {
+                if (crouchRoutine != null) StopCoroutine(crouchRoutine);
+                crouchRoutine = StartCoroutine(SmoothCrouch());
+            }
+        }
+    }
+
+    //I am so dissapointed in myself
+    private IEnumerator SmoothCrouch()
+    {
+        isCrouching = true;
+        float elapsedTime = 0f;
+        Vector3 targetCamPos = new Vector3(originalCamPos.x, originalCamPos.y - crouchCamPosOffset, originalCamPos.z);
+        float targetHeight = crouchHeight;
+
+        while (elapsedTime < crouchTransitionSpeed)
+        {
+            playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
+            cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, targetCamPos, (elapsedTime / crouchTransitionSpeed));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCollider.height = targetHeight;
+        cam.transform.localPosition = targetCamPos;
+    }
+
+    //i regret every single ideas that i have pooped out of my brain
+    private IEnumerator SmoothStandUp()
+    {
+        isCrouching = false;
+        float elapsedTime = 0f;
+        float targetHeight = originalHeight;
+
+        while (elapsedTime < crouchTransitionSpeed)
+        {
+            playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
+            cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPos, (elapsedTime / crouchTransitionSpeed));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCollider.height = targetHeight;
+        cam.transform.localPosition = originalCamPos;
     }
 
     private void leaningMoment()
@@ -128,7 +196,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("Teleport"))
+        if (other.gameObject.CompareTag("Teleport"))
         {
             teleportationIcon.gameObject.SetActive(true);
         }

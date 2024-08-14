@@ -17,6 +17,10 @@ public class EnemyScript : MonoBehaviour
     public Transform target;
     private Rigidbody enemyRB;
 
+    public int MaxHealth;
+    [SerializeField] private int CurrentHealth;
+
+
     public float wanderSpeed = 2f;
     public float chasingSpeed = 8f;
     //public float range = 2.1f;
@@ -24,6 +28,7 @@ public class EnemyScript : MonoBehaviour
 
     private float distance;
     public float viewingAngle = 45f;
+    public float raycastHeight = 0.2f;
 
     [SerializeField] private float rayLength = 2f;
 
@@ -38,6 +43,8 @@ public class EnemyScript : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         enemyRB = GetComponent<Rigidbody>();
         target = player.transform;
+
+        CurrentHealth = MaxHealth;
 
         wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
         targetRotation = Quaternion.LookRotation(wanderDirection);
@@ -105,7 +112,7 @@ public class EnemyScript : MonoBehaviour
         Vector3 horizontalVelocity = wanderDirection * wanderSpeed;
         enemyRB.velocity = new Vector3(horizontalVelocity.x, enemyRB.velocity.y, horizontalVelocity.z);
 
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.2f; // Adjust if necessary to start from the middle of the enemy
+        Vector3 rayOrigin = transform.position + Vector3.up * raycastHeight; // Adjust if necessary to start from the middle of the enemy
         Vector3 rayDirection = wanderDirection;
 
         Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
@@ -140,5 +147,18 @@ public class EnemyScript : MonoBehaviour
         Vector3 targetDirection = target.position - transform.position;
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+    }
+
+    private void OnCollisionTriggerEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Bullet")
+        {
+            MaxHealth--;
+            CurrentHealth = MaxHealth;
+            if (CurrentHealth == 0)
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 }

@@ -9,4 +9,9 @@ public class BulletScript : MonoBehaviour
     {
         Destroy(this.gameObject, bulletCollisionTime);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Destroy(this.gameObject, bulletCollisionTime);
+    }
 }

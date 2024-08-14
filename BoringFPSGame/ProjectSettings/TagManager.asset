@@ -12,6 +12,7 @@ TagManager:
   - Teleport
   - Interactable
   - Barrier
+  - Enemies
   layers:
   - Default
   - TransparentFX

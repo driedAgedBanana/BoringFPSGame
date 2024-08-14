@@ -33,7 +33,7 @@ public class shootingScript : MonoBehaviour
     public Transform shootingPoint;
     public GameObject bullet;
     public float Power;
-    [SerializeField] private float bulletTimeAlive = 5f;
+    [SerializeField] private float bulletTimeAlive = 4f;
 
     [Header("SFX")]
     public AudioClip SFX;

@@ -78,7 +78,7 @@ public class PlayerMovementScript : MonoBehaviour
 
         camX -= Input.GetAxis("Mouse Y") * rotationSpeed;
 
-        camX = Mathf.Clamp(camX, -90, 90);
+        camX = Mathf.Clamp(camX, -75, 75);
 
         cam.transform.localEulerAngles = new Vector3(camX, 0, 0);
     }

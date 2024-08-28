@@ -11,8 +11,9 @@ public class PlayerMovementScript : MonoBehaviour
     public float crouchSpeed = 2.5f;
 
     [Header("Crouching")]
-    public float crouchHeight = 1f;
+    public float crouchHeight = 0.4f;
     private bool isCrouching = false;
+    private bool CanStandUp = true;
     private Vector3 originalCamPos;
     [SerializeField] private float crouchCamPosOffset = 0.5f;
     private float originalHeight;

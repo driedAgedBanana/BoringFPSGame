@@ -25,7 +25,6 @@ public class shootingScript : MonoBehaviour
     [Header("ADS FOV")]
     [SerializeField] private float StartFov;
     [SerializeField] private float ADSFov;
-    [SerializeField] private float ADSFovTime;
 
     public float AimFOV { get; private set; }
 
@@ -43,16 +42,16 @@ public class shootingScript : MonoBehaviour
     public GameObject weapon;
     public float recoil = 0.0f;
     public float maxRecoil = 5f;
+    public float aimingRecoil = 0.0f;
+    public float MaxAimingRecoil = 3f;
     Vector3 currentRecoil;
+    Vector3 currentAimingRecoil;
 
     [SerializeField] private bool ADSRecoil = false;
 
     //when hipfire
     public float maxRecoil_z = 20f;
     public float recoilSpeed = 10f;
-    //when aiming
-    public float ADSMaxRecoil_z = 15f;
-    public float ADSRecoilSpeed = 20f;
 
     private void Start()
     {
@@ -84,6 +83,11 @@ public class shootingScript : MonoBehaviour
             shootingSFX.Play();
             ShootingMoment();
         }
+
+        if (isAiming)
+        {
+            AimingRecoil();
+        }
     }
 
     private void AimingMoment()
@@ -102,14 +106,12 @@ public class shootingScript : MonoBehaviour
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, aimingPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, aimingPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(false);
-            ADSRecoil = true;
         }
         else
         {
             gunItSelf.position = Vector3.Lerp(gunItSelf.position, originalWeaponPosition.position, Time.deltaTime * aimingSpeed);
             gunItSelf.rotation = Quaternion.Lerp(gunItSelf.rotation, originalWeaponPosition.rotation, Time.deltaTime * aimingSpeed);
             crosshairImage.gameObject.SetActive(true);
-            ADSRecoil = false;
         }
     }
 
@@ -120,13 +122,21 @@ public class shootingScript : MonoBehaviour
         Destroy(bulletItSelf, bulletTimeAlive);
 
         currentRecoil = currentRecoil + new Vector3(Random.Range(-recoil, recoil), Random.Range(-recoil, recoil), 0);
+
+        currentAimingRecoil = currentAimingRecoil + new Vector3(Random.Range(-aimingRecoil, -MaxAimingRecoil), Random.Range(-aimingRecoil, MaxAimingRecoil), 0);
+
     }
 
     private void recoiling()
     {
         transform.localEulerAngles = currentRecoil;
         currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, Time.deltaTime * 4);
-        
+    }
+
+    private void AimingRecoil()
+    {
+        transform.localEulerAngles = currentAimingRecoil;
+        currentAimingRecoil = Vector3.Lerp(currentAimingRecoil, Vector3.zero, Time.deltaTime * 4);
     }
 
 }

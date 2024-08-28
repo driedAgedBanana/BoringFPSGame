@@ -13,6 +13,7 @@ TagManager:
   - Interactable
   - Barrier
   - Enemies
+  - OneWayTeleport
   layers:
   - Default
   - TransparentFX

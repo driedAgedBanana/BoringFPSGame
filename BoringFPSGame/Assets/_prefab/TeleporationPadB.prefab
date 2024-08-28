@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1465702634460520933}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22.19, y: 5.83, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5127, y: 0.22041908, z: 1.5127}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerObj: {fileID: 0}
-  teleporationDestination: {fileID: 0}
+  teleportationDestination: {fileID: 0}
+  audioSource: {fileID: 0}
 --- !u!23 &6400141575686139431
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -16,7 +16,7 @@ public class Teleportation : MonoBehaviour
     {
         if (audioSource == null)
         {
-            Debug.Log("You haven't assigned the SFX through the inspector!");
+            Debug.LogWarning("You haven't assigned the SFX through the inspector!");
             this.enabled = false;
         }
 

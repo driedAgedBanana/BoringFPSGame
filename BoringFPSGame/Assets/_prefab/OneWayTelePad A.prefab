@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 3934346787736743672}
   - component: {fileID: 6882592565022368740}
-  - component: {fileID: 2777625143070535514}
+  - component: {fileID: 3980515595294166853}
   - component: {fileID: 6400141575686139431}
   - component: {fileID: 6913334380247079543}
   m_Layer: 6
-  m_Name: TeleporationPadA
+  m_Name: OneWayTelePad A
   m_TagString: Teleport
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1465702634460520933}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2777625143070535514
+--- !u!114 &3980515595294166853
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -52,12 +52,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1465702634460520933}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dea7321c66461524e953a461b03fe1c1, type: 3}
+  m_Script: {fileID: 11500000, guid: fbff81627da07e6489482f271b105e4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerObj: {fileID: 0}
   teleportationDestination: {fileID: 0}
-  audioSource: {fileID: 0}
 --- !u!23 &6400141575686139431
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -78,7 +77,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9a28fd5bec43f4f44b5a8417c37169c0, type: 2}
+  - {fileID: 2100000, guid: dbe430a1c66920e41b2868d7da3fae3b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

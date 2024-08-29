@@ -38,6 +38,9 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] private float wanderTimer;
     [SerializeField] private float changeDirectionInterval = 3f; // Adjust as needed
 
+    private HealthManagerScript healthScript;
+    public int EnemyDamage = 10;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -48,6 +51,8 @@ public class EnemyScript : MonoBehaviour
 
         wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
         targetRotation = Quaternion.LookRotation(wanderDirection);
+
+        healthScript = GetComponent<HealthManagerScript>();
     }
 
     void Update()

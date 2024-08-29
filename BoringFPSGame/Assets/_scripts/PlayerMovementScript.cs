@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerMovementScript : MonoBehaviour
 {
-    private HealthManagerScript healthScript;
+    private float healthAmount = 100f; // Moved from HealthManagerScript
 
     [Header("Movement Speed")]
     public float speed = 5f;
@@ -36,6 +36,9 @@ public class PlayerMovementScript : MonoBehaviour
     [Header("Special for teleportation icon")]
     public Image teleportationIcon;
 
+    [Header("Health Management")]
+    public Image HealthBar; // Moved from HealthManagerScript
+
     Rigidbody rb;
     private Camera cam;
     private float camX;
@@ -64,9 +67,8 @@ public class PlayerMovementScript : MonoBehaviour
         originalHeight = playerCollider.height;
         originalCamPos = cam.transform.localPosition;
 
-        healthScript = GetComponent<HealthManagerScript>();
-
-        //teleportationIcon.gameObject.SetActive(false);
+        // Initialize health-related UI
+        HealthBar.fillAmount = healthAmount / 100;
     }
 
     private void Update()
@@ -140,7 +142,6 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
-    //I am so dissapointed in myself
     private IEnumerator SmoothCrouch()
     {
         isCrouching = true;
@@ -160,7 +161,6 @@ public class PlayerMovementScript : MonoBehaviour
         cam.transform.localPosition = targetCamPos;
     }
 
-    //i regret every single ideas that i have pooped out of my brain
     private IEnumerator SmoothStandUp()
     {
         isCrouching = false;
@@ -213,5 +213,38 @@ public class PlayerMovementScript : MonoBehaviour
         {
             teleportationIcon.gameObject.SetActive(false);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Enemies"))
+        {
+            TakingDamage(10);
+        }
+        if(collision.gameObject.CompareTag("Aid"))
+        {
+            Destroy(collision.gameObject);
+            Healing(10);
+        }
+        if(collision.gameObject.CompareTag("RedAid"))
+        {
+            Destroy(collision.gameObject);
+            Healing(30);
+        }
+    }
+
+    // Health management methods
+    public void TakingDamage(float damage)
+    {
+        healthAmount -= damage;
+        HealthBar.fillAmount = healthAmount / 100;
+    }
+
+    public void Healing(float healingAmount)
+    {
+        healthAmount += healingAmount;
+        healthAmount = Mathf.Clamp(healthAmount, 0, 100);
+
+        HealthBar.fillAmount = healthAmount / 100;
     }
 }

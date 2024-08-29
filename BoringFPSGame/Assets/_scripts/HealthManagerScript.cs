@@ -19,12 +19,12 @@ public class HealthManagerScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            TakingDamage(10);
+            TakingDamage(0);
         }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Healing(10);
+            Healing(0);
         }
     }
 

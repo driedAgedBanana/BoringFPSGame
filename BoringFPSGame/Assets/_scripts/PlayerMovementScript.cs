@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class PlayerMovementScript : MonoBehaviour
     public float crouchSpeed = 2.5f;
 
     [Header("Crouching")]
+    public TMP_Text warningText;
+
     public float crouchHeight = 0.4f;
     private bool isCrouching = false;
     private bool CanStandUp = true;
@@ -21,6 +24,7 @@ public class PlayerMovementScript : MonoBehaviour
     private float originalHeight;
     private float crouchTransitionSpeed = 5f; // Speed of transition
     private Coroutine crouchRoutine;
+    private Coroutine warningRoutine;
 
     [Header("Jumping")]
     public float jumpForce = 10;
@@ -125,20 +129,84 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
+    #region it's a nightmare
+
     private void HandleCrouch()
     {
+        Vector3 rayOrigin = transform.position;
+        Vector3 rayDirection = Vector3.up;
+
+        float rayLength = 3f; // Adjust this length if needed
+
+        // Perform the raycast to check for obstacles above the player
+        bool isObstructed = Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, rayLength);
+
+        // Draw the ray for visualization
+        Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.yellow);
+
         if (Input.GetKeyDown(KeyCode.C))
         {
             if (isCrouching)
             {
                 if (crouchRoutine != null) StopCoroutine(crouchRoutine);
-                crouchRoutine = StartCoroutine(SmoothStandUp());
+                if (!isObstructed) // Only stand up if not obstructed
+                {
+                    crouchRoutine = StartCoroutine(SmoothStandUp());
+                    HideWarningText(); // Hide warning message
+                }
+                else
+                {
+                    Debug.Log("Cannot stand up, obstruction detected!");
+                    if (warningRoutine != null) StopCoroutine(warningRoutine);
+                    warningRoutine = StartCoroutine(DisplayWarning("Cannot stand up here!")); // Show warning message
+                }
             }
             else
             {
                 if (crouchRoutine != null) StopCoroutine(crouchRoutine);
                 crouchRoutine = StartCoroutine(SmoothCrouch());
+                HideWarningText(); // Hide warning message when crouching
             }
+        }
+    }
+
+    private IEnumerator DisplayWarning(string message)
+    {
+        warningText.text = message;
+        warningText.gameObject.SetActive(true); // Make sure the text is active
+
+        // Fade in
+        Color textColor = warningText.color;
+        for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
+        {
+            textColor.a = Mathf.Lerp(0, 1, t);
+            warningText.color = textColor;
+            yield return null;
+        }
+        textColor.a = 1;
+        warningText.color = textColor;
+
+        // Wait for 3 seconds
+        yield return new WaitForSeconds(3f);
+
+        // Fade out
+        for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
+        {
+            textColor.a = Mathf.Lerp(1, 0, t);
+            warningText.color = textColor;
+            yield return null;
+        }
+        textColor.a = 0;
+        warningText.color = textColor;
+
+        warningText.gameObject.SetActive(false); // Deactivate text after fading out
+    }
+
+    private void HideWarningText()
+    {
+        if (warningText != null)
+        {
+            warningText.gameObject.SetActive(false); // Hide the text immediately
         }
     }
 
@@ -178,6 +246,8 @@ public class PlayerMovementScript : MonoBehaviour
         playerCollider.height = targetHeight;
         cam.transform.localPosition = originalCamPos;
     }
+
+    #endregion
 
     private void leaningMoment()
     {

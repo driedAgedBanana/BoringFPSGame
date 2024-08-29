@@ -6,7 +6,14 @@ public enum enemyState
 {
     Wander,
     Follow,
-    Die
+    Die //basically useless now
+}
+
+[System.Serializable]
+public class lootTableScript
+{
+    public GameObject itemPrefab;
+    [Range(0, 100)] public float dropChance;
 }
 
 public class EnemyScript : MonoBehaviour
@@ -20,10 +27,8 @@ public class EnemyScript : MonoBehaviour
     public int MaxHealth;
     [SerializeField] private int CurrentHealth;
 
-
     public float wanderSpeed = 2f;
     public float chasingSpeed = 8f;
-    //public float range = 2.1f;
     public float rotationSpeed = 2f;
 
     private float distance;
@@ -38,8 +43,11 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] private float wanderTimer;
     [SerializeField] private float changeDirectionInterval = 3f; // Adjust as needed
 
+    // Loot-related variables
+    [Header("Loot")]
+    public List<lootTableScript> LootTable = new List<lootTableScript>();
+
     private HealthManagerScript healthScript;
-    public int EnemyDamage = 10;
 
     void Start()
     {
@@ -64,7 +72,6 @@ public class EnemyScript : MonoBehaviour
         Vector3 targetDirection = target.transform.position - transform.position;
         float angle = Vector3.Angle(targetDirection, transform.forward);
         Debug.DrawRay(transform.position, targetDirection, Color.green);
-        //Debug.Log(distance);
 
         if (angle <= viewingAngle && distance < 6)
         {
@@ -84,9 +91,6 @@ public class EnemyScript : MonoBehaviour
                 break;
             case enemyState.Follow:
                 Following();
-                break;
-            case enemyState.Die:
-                // No die yet :(
                 break;
         }
 
@@ -127,8 +131,6 @@ public class EnemyScript : MonoBehaviour
         {
             if (hitInfo.collider.CompareTag("Wall") || hitInfo.collider.CompareTag("Barrier"))
             {
-                //Debug.Log("Enemy hit a wall!");
-
                 // Rotate to a new random direction
                 wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
                 targetRotation = Quaternion.LookRotation(wanderDirection);
@@ -154,29 +156,57 @@ public class EnemyScript : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 
-    //private void OnCollisionTriggerEnter(Collision collision)
-    //{
-    //    if (collision.gameObject.tag == "Bullet")
-    //    {
-    //        MaxHealth--;
-    //        CurrentHealth = MaxHealth;
-    //        if (CurrentHealth == 0)
-    //        {
-    //            Destroy(gameObject);
-    //        }
-    //    }
-    //}
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Bullet")
         {
-            MaxHealth--;
-            CurrentHealth = MaxHealth;
-            if (CurrentHealth == 0)
+            TakeDamage(1); // Adjust the damage value as needed
+        }
+    }
+
+    private void TakeDamage(int damage)
+    {
+        CurrentHealth -= damage;
+
+        if (CurrentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        // Create a list to store items that are eligible for dropping based on their drop chance
+        List<lootTableScript> eligibleItems = new List<lootTableScript>();
+
+        // Populate the list with items whose drop chance is successful
+        foreach (lootTableScript lootItem in LootTable)
+        {
+            if (Random.Range(0f, 100f) <= lootItem.dropChance)
             {
-                Destroy(gameObject);
+                eligibleItems.Add(lootItem);
             }
+        }
+
+        // If there are eligible items, choose one randomly to drop
+        if (eligibleItems.Count > 0)
+        {
+            // Choose a random item from the list of eligible items
+            lootTableScript chosenItem = eligibleItems[Random.Range(0, eligibleItems.Count)];
+
+            // Drop the chosen item
+            InstantiateLoot(chosenItem.itemPrefab);
+        }
+
+        // Destroy the gameObject
+        Destroy(gameObject);
+    }
+
+    void InstantiateLoot(GameObject loot)
+    {
+        if (loot != null)
+        {
+            GameObject droppedItemLoot = Instantiate(loot, transform.position, Quaternion.identity);
         }
     }
 }

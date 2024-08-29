@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class PlayerMovementScript : MonoBehaviour
 {
+    private HealthManagerScript healthScript;
+
     [Header("Movement Speed")]
     public float speed = 5f;
     public float sprintSpeed = 10f;
@@ -61,6 +63,8 @@ public class PlayerMovementScript : MonoBehaviour
 
         originalHeight = playerCollider.height;
         originalCamPos = cam.transform.localPosition;
+
+        healthScript = GetComponent<HealthManagerScript>();
 
         //teleportationIcon.gameObject.SetActive(false);
     }

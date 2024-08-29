@@ -149,7 +149,20 @@ public class EnemyScript : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 
-    private void OnCollisionTriggerEnter(Collision collision)
+    //private void OnCollisionTriggerEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Bullet")
+    //    {
+    //        MaxHealth--;
+    //        CurrentHealth = MaxHealth;
+    //        if (CurrentHealth == 0)
+    //        {
+    //            Destroy(gameObject);
+    //        }
+    //    }
+    //}
+
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Bullet")
         {

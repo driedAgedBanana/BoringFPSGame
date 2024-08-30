@@ -45,7 +45,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     [Header("Flashlight Settings")]
     public Light flashLight;
-
+    public Image batteryIndicator;
     public bool drainOverTime;
     public float maxBrightness;
     public float minBrightness;
@@ -81,6 +81,8 @@ public class PlayerMovementScript : MonoBehaviour
 
         // Initialize health-related UI
         HealthBar.fillAmount = healthAmount / 100;
+
+        batteryIndicator.fillAmount = flashLight.intensity / maxBrightness;
     }
 
     private void Update()
@@ -288,6 +290,9 @@ public class PlayerMovementScript : MonoBehaviour
                 flashLight.intensity -= Time.deltaTime * (drainingRate / 1000);
             }
         }
+
+        batteryIndicator.fillAmount = flashLight.intensity / maxBrightness;
+
         if (Input.GetKeyDown(KeyCode.F))
         {
             if(flashLight != null)
@@ -301,6 +306,7 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
+    //All mechanic for the flashlight
     private void replaceBattery(float amount)
     {
         flashLight.intensity += amount;

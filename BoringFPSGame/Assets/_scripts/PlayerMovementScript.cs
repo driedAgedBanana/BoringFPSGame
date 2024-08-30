@@ -44,7 +44,12 @@ public class PlayerMovementScript : MonoBehaviour
     public Image HealthBar; // Moved from HealthManagerScript
 
     [Header("Flashlight Settings")]
-    public Light flashLight;
+    public Light flashlight;
+
+    public float maxFlashlightIntensity = 5f; // Maximum intensity for the flashlight
+    public float flashlightTransitionSpeed = 2f; // Speed of the flashlight intensity transition
+
+    private Coroutine flashlightRoutine;
 
     Rigidbody rb;
     private Camera cam;
@@ -76,6 +81,12 @@ public class PlayerMovementScript : MonoBehaviour
 
         // Initialize health-related UI
         HealthBar.fillAmount = healthAmount / 100;
+
+        if (flashlight != null)
+        {
+            flashlight.intensity = 0f; // Start with the flashlight off
+            flashlight.enabled = false;
+        }
     }
 
     private void Update()
@@ -84,7 +95,7 @@ public class PlayerMovementScript : MonoBehaviour
         leaningMoment();
         camMovement();
         HandleCrouch();
-        handleFlashlight();
+        HandleFlashlight();
     }
 
     private void camMovement()
@@ -273,14 +284,46 @@ public class PlayerMovementScript : MonoBehaviour
         transform.localRotation = Quaternion.Slerp(transform.localRotation, targetLeanRotation, Time.deltaTime * leaningSpeed);
     }
 
-    private void handleFlashlight()
+    private void HandleFlashlight()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if(flashLight != null)
+            if (flashlightRoutine != null) StopCoroutine(flashlightRoutine);
+            flashlightRoutine = StartCoroutine(ToggleFlashlight());
+        }
+    }
+
+    private IEnumerator ToggleFlashlight()
+    {
+        bool turningOn = !flashlight.enabled || flashlight.intensity == 0f;
+
+        if (turningOn)
+        {
+            flashlight.enabled = true;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < flashlightTransitionSpeed)
             {
-                flashLight.enabled = !flashLight.enabled;
+                flashlight.intensity = Mathf.Lerp(0f, maxFlashlightIntensity, elapsedTime / flashlightTransitionSpeed);
+                elapsedTime += Time.deltaTime;
+                yield return null;
             }
+
+            flashlight.intensity = maxFlashlightIntensity; // Ensure it's exactly the max intensity
+        }
+        else
+        {
+            float elapsedTime = 0f;
+
+            while (elapsedTime < flashlightTransitionSpeed)
+            {
+                flashlight.intensity = Mathf.Lerp(maxFlashlightIntensity, 0f, elapsedTime / flashlightTransitionSpeed);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            flashlight.intensity = 0f; // Ensure it's completely off
+            flashlight.enabled = false;
         }
     }
 

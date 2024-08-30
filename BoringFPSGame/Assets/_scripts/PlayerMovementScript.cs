@@ -44,12 +44,12 @@ public class PlayerMovementScript : MonoBehaviour
     public Image HealthBar; // Moved from HealthManagerScript
 
     [Header("Flashlight Settings")]
-    public Light flashlight;
+    public Light flashLight;
 
-    public float maxFlashlightIntensity = 5f; // Maximum intensity for the flashlight
-    public float flashlightTransitionSpeed = 2f; // Speed of the flashlight intensity transition
-
-    private Coroutine flashlightRoutine;
+    public bool drainOverTime;
+    public float maxBrightness;
+    public float minBrightness;
+    public float drainingRate;
 
     Rigidbody rb;
     private Camera cam;
@@ -81,12 +81,6 @@ public class PlayerMovementScript : MonoBehaviour
 
         // Initialize health-related UI
         HealthBar.fillAmount = healthAmount / 100;
-
-        if (flashlight != null)
-        {
-            flashlight.intensity = 0f; // Start with the flashlight off
-            flashlight.enabled = false;
-        }
     }
 
     private void Update()
@@ -95,7 +89,7 @@ public class PlayerMovementScript : MonoBehaviour
         leaningMoment();
         camMovement();
         HandleCrouch();
-        HandleFlashlight();
+        handleFlashlight();
     }
 
     private void camMovement()
@@ -284,47 +278,32 @@ public class PlayerMovementScript : MonoBehaviour
         transform.localRotation = Quaternion.Slerp(transform.localRotation, targetLeanRotation, Time.deltaTime * leaningSpeed);
     }
 
-    private void HandleFlashlight()
+    private void handleFlashlight()
     {
+        flashLight.intensity = Mathf.Clamp(flashLight.intensity, minBrightness, maxBrightness);
+        if(drainOverTime == true && flashLight.enabled == true)
+        {
+            if(flashLight.intensity > minBrightness)
+            {
+                flashLight.intensity -= Time.deltaTime * (drainingRate / 1000);
+            }
+        }
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (flashlightRoutine != null) StopCoroutine(flashlightRoutine);
-            flashlightRoutine = StartCoroutine(ToggleFlashlight());
+            if(flashLight != null)
+            {
+                flashLight.enabled = !flashLight.enabled;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            replaceBattery(1f);
         }
     }
 
-    private IEnumerator ToggleFlashlight()
+    private void replaceBattery(float amount)
     {
-        bool turningOn = !flashlight.enabled || flashlight.intensity == 0f;
-
-        if (turningOn)
-        {
-            flashlight.enabled = true;
-            float elapsedTime = 0f;
-
-            while (elapsedTime < flashlightTransitionSpeed)
-            {
-                flashlight.intensity = Mathf.Lerp(0f, maxFlashlightIntensity, elapsedTime / flashlightTransitionSpeed);
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            flashlight.intensity = maxFlashlightIntensity; // Ensure it's exactly the max intensity
-        }
-        else
-        {
-            float elapsedTime = 0f;
-
-            while (elapsedTime < flashlightTransitionSpeed)
-            {
-                flashlight.intensity = Mathf.Lerp(maxFlashlightIntensity, 0f, elapsedTime / flashlightTransitionSpeed);
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            flashlight.intensity = 0f; // Ensure it's completely off
-            flashlight.enabled = false;
-        }
+        flashLight.intensity += amount;
     }
 
     private void OnTriggerEnter(Collider other)

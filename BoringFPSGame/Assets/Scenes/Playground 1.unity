@@ -3993,9 +3993,11 @@ MonoBehaviour:
   leaningSpeed: 15
   teleportationIcon: {fileID: 856522862}
   HealthBar: {fileID: 962238778}
-  flashlight: {fileID: 986683421}
-  maxFlashlightIntensity: 5
-  flashlightTransitionSpeed: 2
+  flashLight: {fileID: 986683421}
+  drainOverTime: 1
+  maxBrightness: 7
+  minBrightness: 0
+  drainingRate: 90
   target: {fileID: 857366996}
 --- !u!114 &857367003
 MonoBehaviour:
@@ -5003,7 +5005,7 @@ Light:
   m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1

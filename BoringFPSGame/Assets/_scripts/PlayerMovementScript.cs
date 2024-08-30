@@ -43,6 +43,9 @@ public class PlayerMovementScript : MonoBehaviour
     [Header("Health Management")]
     public Image HealthBar; // Moved from HealthManagerScript
 
+    [Header("Flashlight Settings")]
+    public Light flashLight;
+
     Rigidbody rb;
     private Camera cam;
     private float camX;
@@ -81,6 +84,7 @@ public class PlayerMovementScript : MonoBehaviour
         leaningMoment();
         camMovement();
         HandleCrouch();
+        handleFlashlight();
     }
 
     private void camMovement()
@@ -267,6 +271,17 @@ public class PlayerMovementScript : MonoBehaviour
         }
 
         transform.localRotation = Quaternion.Slerp(transform.localRotation, targetLeanRotation, Time.deltaTime * leaningSpeed);
+    }
+
+    private void handleFlashlight()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if(flashLight != null)
+            {
+                flashLight.enabled = !flashLight.enabled;
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)

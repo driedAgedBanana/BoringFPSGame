@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PlayerMovementScript : MonoBehaviour
 {
-    private float healthAmount = 100f; // Moved from HealthManagerScript
+    private shootingScript Shooting;
+
+    private float healthAmount = 100f;
 
     [Header("Movement Speed")]
     public float speed = 5f;
@@ -42,6 +45,11 @@ public class PlayerMovementScript : MonoBehaviour
 
     [Header("Health Management")]
     public Image HealthBar; // Moved from HealthManagerScript
+
+    [Header("For ammo and munitions")]
+    public GameObject ammoClip;
+    public GameObject ammoBox;
+    private int TotalAmmo;
 
     [Header("Flashlight Settings")]
     public Light flashLight;
@@ -83,6 +91,12 @@ public class PlayerMovementScript : MonoBehaviour
         HealthBar.fillAmount = healthAmount / 100;
 
         batteryIndicator.fillAmount = flashLight.intensity / maxBrightness;
+
+        Shooting = gameObject.GetComponentInChildren<shootingScript>();
+        if (Shooting == null)
+        {
+            Debug.LogError("Shooting script not found on the GameObject.");
+        }
     }
 
     private void Update()
@@ -314,11 +328,33 @@ public class PlayerMovementScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Teleport"))
+        if (Shooting == null)
         {
-            teleportationIcon.gameObject.SetActive(true);
+            Debug.LogError("Shooting is null");
+            return;
+        }
+
+        if (other.gameObject.CompareTag("AmmoClip"))
+        {
+            Debug.Log("AmmoClip triggered");
+            Destroy(other.gameObject);
+            Shooting.PickupAmmoClip(10); // Assuming a clip gives 10 ammo
+        }
+        else if (other.gameObject.CompareTag("AmmoBox"))
+        {
+            Debug.Log("AmmoBox triggered");
+            Destroy(other.gameObject);
+            Shooting.PickupAmmoBox(60); // Assuming a box gives 60 ammo
+        }
+        else if (other.gameObject.CompareTag("Teleport"))
+        {
+            if (teleportationIcon != null)
+            {
+                teleportationIcon.gameObject.SetActive(true);
+            }
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {

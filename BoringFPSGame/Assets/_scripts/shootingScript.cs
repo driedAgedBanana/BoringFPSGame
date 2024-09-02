@@ -44,6 +44,9 @@ public class shootingScript : MonoBehaviour
 
     public TextMeshProUGUI ammoText;
 
+    public GameObject ammoClip;
+    public GameObject ammoBox;
+
     [Header("SFX")]
     public AudioClip SFX;
     private AudioSource shootingSFX;
@@ -206,9 +209,25 @@ public class shootingScript : MonoBehaviour
 
     }
 
-    private void UpdateAmmoGUI()
+    public void UpdateAmmoGUI()
     {
         ammoText.text = $"{CurrentAmmo} / {TotalAmmo}";
     }
 
+    public void PickupAmmoClip(int ammoAmount)
+    {
+        if (TotalAmmo < 160)
+        {
+            TotalAmmo = Mathf.Min(TotalAmmo + ammoAmount, 160);
+            UpdateAmmoGUI();
+        }
+    }
+
+    // Method to handle pickup of ammo box
+    public void PickupAmmoBox(int boxAmount)
+    {
+        int amountToAdd = Mathf.Min(boxAmount, 160 - TotalAmmo);
+        TotalAmmo += amountToAdd;
+        UpdateAmmoGUI();
+    }
 }

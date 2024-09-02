@@ -4,20 +4,34 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemySpawner;
+    public GameObject enemyPrefab; // Changed from enemySpawner to enemyPrefab
 
-    [SerializeField] private float interval = 3f;
+    [SerializeField] private float spawnInterval = 3f;
     private float timer;
 
-    // Update is called once per frame
+    public int maximumEnemies = 20;
+
     void Update()
     {
+        // Update timer
         timer += Time.deltaTime;
 
-        if (timer > interval)
+        // Check if it's time to spawn a new enemy and if the number of active enemies is below the maximum
+        if (timer >= spawnInterval && GetActiveEnemyCount() < maximumEnemies)
         {
+            // Reset the timer
             timer = 0f;
-            Instantiate(enemySpawner, transform.position, transform.rotation);
+
+            // Instantiate a new enemy
+            Instantiate(enemyPrefab, transform.position, transform.rotation);
         }
+    }
+
+    // Method to count active enemies
+    private int GetActiveEnemyCount()
+    {
+        // Find all objects with the "Enemy" tag and return their count
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemies");
+        return enemies.Length;
     }
 }

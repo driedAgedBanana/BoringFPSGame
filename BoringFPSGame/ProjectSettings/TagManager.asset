@@ -16,6 +16,8 @@ TagManager:
   - OneWayTeleport
   - Aid
   - RedAid
+  - AmmoClip
+  - AmmoBox
   layers:
   - Default
   - TransparentFX

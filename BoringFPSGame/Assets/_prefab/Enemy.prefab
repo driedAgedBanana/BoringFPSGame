@@ -195,6 +195,10 @@ MonoBehaviour:
   - itemPrefab: {fileID: 7975998872709633962, guid: b76de77e9e36a1c44b094c10711555eb, type: 3}
     dropChance: 30
   - itemPrefab: {fileID: 3343229072912101299, guid: bf58252b67b807e4eb830e9401bb344d, type: 3}
+    dropChance: 15
+  - itemPrefab: {fileID: 7285241698289994806, guid: 7a0c4d296fa47f14a866eff7d831d335, type: 3}
+    dropChance: 35
+  - itemPrefab: {fileID: 1944700230332019044, guid: 8651831d087a222469c55e9b0209d42c, type: 3}
     dropChance: 10
   quickTurnSpeed: 20
   anticipationFactor: 1.5

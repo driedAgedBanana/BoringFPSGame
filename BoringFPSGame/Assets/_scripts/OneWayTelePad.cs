@@ -9,10 +9,16 @@ public class ImmadiateTeleportation : MonoBehaviour
 
     private bool isPlayerInTriggerPad = false;
 
+    public AudioClip audioSource;
+    private AudioSource teleportingSFX;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        teleportingSFX = GetComponent<AudioSource>();
+        teleportingSFX.playOnAwake = false;
+        teleportingSFX.clip = audioSource;
+        teleportingSFX.Stop();
     }
 
     // Update is called once per frame
@@ -25,6 +31,7 @@ public class ImmadiateTeleportation : MonoBehaviour
                 Debug.Log("Player touched the immediate teleportation pad!");
 
                 playerObj.transform.position = teleportationDestination.transform.position;
+                teleportingSFX.Play();
             }
         }
         else

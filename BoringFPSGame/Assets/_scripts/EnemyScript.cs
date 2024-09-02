@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public enum enemyState
+public enum EnemyState
 {
     Wander,
     Follow,
-    Die //basically useless now
+    Search,
+    Hide,
+    Die
 }
 
 [System.Serializable]
-public class lootTableScript
+public class LootTableScript
 {
     public GameObject itemPrefab;
     [Range(0, 100)] public float dropChance;
@@ -19,152 +22,161 @@ public class lootTableScript
 public class EnemyScript : MonoBehaviour
 {
     GameObject player;
-    public enemyState currentState = enemyState.Wander;
+    public EnemyState currentState = EnemyState.Wander;
 
-    public Transform target;
-    private Rigidbody enemyRB;
-
+    private NavMeshAgent navAgent;
     public int MaxHealth;
     [SerializeField] private int CurrentHealth;
 
-    public float wanderSpeed = 2f;
-    public float chasingSpeed = 8f;
-    public float rotationSpeed = 2f;
-
     private float distance;
-    public float viewingAngle = 45f;
-    public float raycastHeight = 0.2f;
+    public float viewingAngle = 85f;
+    public float chaseDistance = 8f;
 
-    [SerializeField] private float rayLength = 2f;
-
-    private Vector3 wanderDirection;
-    private Quaternion targetRotation;
     private bool canSeePlayer = false;
-    [SerializeField] private float wanderTimer;
-    [SerializeField] private float changeDirectionInterval = 3f; // Adjust as needed
+    private Vector3 lastKnownPlayerPosition;
+    private Vector3 hidingSpot;
 
-    // Loot-related variables
     [Header("Loot")]
-    public List<lootTableScript> LootTable = new List<lootTableScript>();
+    public List<LootTableScript> LootTable = new List<LootTableScript>();
 
-    private HealthManagerScript healthScript;
+    public float quickTurnSpeed = 20f; // Speed at which the enemy turns towards the player
+    public float anticipationFactor = 1.5f; // Factor by which the enemy anticipates the player's movement
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        enemyRB = GetComponent<Rigidbody>();
-        target = player.transform;
+        navAgent = GetComponent<NavMeshAgent>();
 
         CurrentHealth = MaxHealth;
-
-        wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-        targetRotation = Quaternion.LookRotation(wanderDirection);
-
-        healthScript = GetComponent<HealthManagerScript>();
+        currentState = EnemyState.Wander;
+        navAgent.speed = 5f;
     }
 
     void Update()
     {
-        // Update the distance to the player
         distance = Vector3.Distance(transform.position, player.transform.position);
-
-        // Check if the enemy can see the player
-        Vector3 targetDirection = target.transform.position - transform.position;
+        Vector3 targetDirection = player.transform.position - transform.position;
         float angle = Vector3.Angle(targetDirection, transform.forward);
-        Debug.DrawRay(transform.position, targetDirection, Color.green);
 
-        if (angle <= viewingAngle && distance < 6)
+        if (angle <= viewingAngle && distance < chaseDistance)
         {
             canSeePlayer = true;
-            print("Enemy sees player");
+            lastKnownPlayerPosition = player.transform.position;
         }
         else
         {
             canSeePlayer = false;
         }
 
-        // Switch states based on the enemy's current state and player visibility
         switch (currentState)
         {
-            case enemyState.Wander:
-                Wandering();
+            case EnemyState.Wander:
+                Wander();
                 break;
-            case enemyState.Follow:
-                Following();
+            case EnemyState.Follow:
+                Follow();
+                break;
+            case EnemyState.Search:
+                Search();
+                break;
+            case EnemyState.Hide:
+                Hide();
                 break;
         }
 
-        if (canSeePlayer && currentState != enemyState.Die)
+        if (canSeePlayer && currentState != EnemyState.Die)
         {
-            Debug.Log("Enemy switch to chasing state");
-            currentState = enemyState.Follow;
+            currentState = EnemyState.Follow;
+            QuicklyTurnTowardsPlayer();  // Rapidly turn towards the player
         }
-        else if (!canSeePlayer && currentState != enemyState.Die)
+        else if (!canSeePlayer && currentState != EnemyState.Die)
         {
-            Debug.Log("Enemy switch to wandering state");
-            currentState = enemyState.Wander;
-        }
-    }
-
-    private void Wandering()
-    {
-        wanderTimer += Time.deltaTime;
-        if (wanderTimer > changeDirectionInterval)
-        {
-            // Choose a new random direction
-            wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-            targetRotation = Quaternion.LookRotation(wanderDirection);
-            wanderTimer = 0f; // Reset the timer
-        }
-
-        // Move in the current wander direction
-        Vector3 horizontalVelocity = wanderDirection * wanderSpeed;
-        enemyRB.velocity = new Vector3(horizontalVelocity.x, enemyRB.velocity.y, horizontalVelocity.z);
-
-        Vector3 rayOrigin = transform.position + Vector3.up * raycastHeight; // Adjust if necessary to start from the middle of the enemy
-        Vector3 rayDirection = wanderDirection;
-
-        Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
-
-        // Check if the enemy hits a wall
-        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, rayLength))
-        {
-            if (hitInfo.collider.CompareTag("Wall") || hitInfo.collider.CompareTag("Barrier"))
+            if (currentState == EnemyState.Follow)
             {
-                // Rotate to a new random direction
-                wanderDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-                targetRotation = Quaternion.LookRotation(wanderDirection);
-
-                // Reset the timer so it doesn't immediately change direction again
-                wanderTimer = 0f;
+                currentState = EnemyState.Search;
+                IdentifyHidingSpot();
+            }
+            else if (currentState == EnemyState.Search && !canSeePlayer)
+            {
+                currentState = EnemyState.Hide;
+            }
+            else
+            {
+                currentState = EnemyState.Wander;
             }
         }
-
-        // Smoothly rotate towards the target rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 
-    private void Following()
+    private void QuicklyTurnTowardsPlayer()
     {
-        Vector3 direction = (target.position - transform.position).normalized;
-        Vector3 horizontalVelocity = new Vector3(direction.x * chasingSpeed, enemyRB.velocity.y, direction.z * chasingSpeed);
-        enemyRB.velocity = horizontalVelocity;
+        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * quickTurnSpeed);
+    }
 
-        // Smoothly rotate to face the player
-        Vector3 targetDirection = target.position - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+    private void Wander()
+    {
+        if (!navAgent.hasPath)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * 10f;
+            randomDirection += transform.position;
+            NavMeshHit navHit;
+            NavMesh.SamplePosition(randomDirection, out navHit, 10f, NavMesh.AllAreas);
+            navAgent.SetDestination(navHit.position);
+        }
+    }
+
+    private void Follow()
+    {
+        navAgent.speed = 10f; // Increased speed during chase
+
+        // Anticipate the player's movement by slightly adjusting the target position
+        Vector3 anticipatedPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * anticipationFactor;
+        navAgent.SetDestination(anticipatedPosition);
+    }
+
+    private void Search()
+    {
+        navAgent.speed = 6f;
+        navAgent.SetDestination(lastKnownPlayerPosition);
+
+        if (navAgent.remainingDistance < 1f && !canSeePlayer)
+        {
+            currentState = EnemyState.Hide;
+        }
+    }
+
+    private void Hide()
+    {
+        if (hidingSpot != Vector3.zero)
+        {
+            navAgent.speed = 5f;
+            navAgent.SetDestination(hidingSpot);
+
+            if (navAgent.remainingDistance < 1f)
+            {
+                currentState = EnemyState.Wander;
+            }
+        }
+    }
+
+    private void IdentifyHidingSpot()
+    {
+        hidingSpot = transform.position + Random.insideUnitSphere * 5f;
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(hidingSpot, out navHit, 5f, NavMesh.AllAreas);
+        hidingSpot = navHit.position;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Bullet")
+        if (collision.gameObject.CompareTag("Bullet"))
         {
-            TakeDamage(1); // Adjust the damage value as needed
+            TakeDamage(1);
         }
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
 
@@ -176,11 +188,9 @@ public class EnemyScript : MonoBehaviour
 
     private void Die()
     {
-        // Create a list to store items that are eligible for dropping based on their drop chance
-        List<lootTableScript> eligibleItems = new List<lootTableScript>();
+        List<LootTableScript> eligibleItems = new List<LootTableScript>();
 
-        // Populate the list with items whose drop chance is successful
-        foreach (lootTableScript lootItem in LootTable)
+        foreach (LootTableScript lootItem in LootTable)
         {
             if (Random.Range(0f, 100f) <= lootItem.dropChance)
             {
@@ -188,17 +198,12 @@ public class EnemyScript : MonoBehaviour
             }
         }
 
-        // If there are eligible items, choose one randomly to drop
         if (eligibleItems.Count > 0)
         {
-            // Choose a random item from the list of eligible items
-            lootTableScript chosenItem = eligibleItems[Random.Range(0, eligibleItems.Count)];
-
-            // Drop the chosen item
+            LootTableScript chosenItem = eligibleItems[Random.Range(0, eligibleItems.Count)];
             InstantiateLoot(chosenItem.itemPrefab);
         }
 
-        // Destroy the gameObject
         Destroy(gameObject);
     }
 
@@ -206,7 +211,7 @@ public class EnemyScript : MonoBehaviour
     {
         if (loot != null)
         {
-            GameObject droppedItemLoot = Instantiate(loot, transform.position, Quaternion.identity);
+            Instantiate(loot, transform.position, Quaternion.identity);
         }
     }
 }

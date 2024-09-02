@@ -5,13 +5,28 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour
 {
     [SerializeField] private float bulletCollisionTime = 0.01f;
-    private void OnCollisionEnter(Collision collision)
+    [SerializeField] private int bulletDamage = 1; // Added variable for bullet damage
+
+    private void Start()
     {
-        Destroy(this.gameObject, bulletCollisionTime);
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        Destroy(this.gameObject, bulletCollisionTime);
+        if (collision.gameObject.CompareTag("Enemies"))
+        {
+            EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(bulletDamage);
+            }
+        }
+
+        Destroy(gameObject, bulletCollisionTime);
     }
 }

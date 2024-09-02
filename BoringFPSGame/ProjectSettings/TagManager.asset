@@ -26,9 +26,9 @@ TagManager:
   - Ground
   - Wall
   - Weapon
-  - 
-  - 
-  - 
+  - Player
+  - Spawner
+  - SafeGround
   - 
   - 
   - 

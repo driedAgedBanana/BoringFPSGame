@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class shootingScript : MonoBehaviour
 {
@@ -34,9 +35,21 @@ public class shootingScript : MonoBehaviour
     public float Power;
     [SerializeField] private float bulletTimeAlive = 4f;
 
+    [Header("Ammo Counting")]
+    public int MaxAmmo = 8;
+    public int CurrentAmmo;
+    public int TotalAmmo = 160;
+    public float ReloadingTime = 2.5f;
+    private bool isReloading = false;
+
+    public TextMeshProUGUI ammoText;
+
     [Header("SFX")]
     public AudioClip SFX;
     private AudioSource shootingSFX;
+
+    public AudioClip ReloadSFX;
+    private AudioSource reloadingSFX;
 
     [Header("Recoil")]
     public GameObject weapon;
@@ -56,7 +69,6 @@ public class shootingScript : MonoBehaviour
     private void Start()
     {
         mainCamera = GameObject.FindWithTag("MainCamera").transform;
-        //gunRecoil = mainCamera.GetComponent<GunRecoil>();
 
         gunItSelf.position = originalWeaponPosition.position;
         gunItSelf.rotation = originalWeaponPosition.rotation;
@@ -67,21 +79,41 @@ public class shootingScript : MonoBehaviour
             this.enabled = false;
         }
 
-        shootingSFX = GetComponent<AudioSource>();
+        shootingSFX = gameObject.AddComponent<AudioSource>();
         shootingSFX.playOnAwake = false;
         shootingSFX.clip = SFX;
         shootingSFX.Stop();
+
+        reloadingSFX = gameObject.AddComponent<AudioSource>();
+        reloadingSFX.playOnAwake = false;
+        reloadingSFX.clip = ReloadSFX;
+        reloadingSFX.Stop();
+
+        CurrentAmmo = MaxAmmo;
     }
 
     private void Update()
     {
+        if (isReloading)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.R) && CurrentAmmo < MaxAmmo || CurrentAmmo == 0)
+        {
+            StartCoroutine(Reloading());
+            reloadingSFX.Play();
+            return;
+        }
+
         AimingMoment();
         recoiling();
 
         if (Input.GetKeyDown(shootKey))
         {
-            shootingSFX.Play();
-            ShootingMoment();
+            if (CurrentAmmo > 0) // Ensure shooting happens only if there's ammo
+            {
+                shootingSFX.Play();
+                ShootingMoment();
+            }
         }
 
         if (isAiming)
@@ -125,6 +157,11 @@ public class shootingScript : MonoBehaviour
 
         currentAimingRecoil = currentAimingRecoil + new Vector3(Random.Range(-aimingRecoil, -MaxAimingRecoil), Random.Range(-aimingRecoil, MaxAimingRecoil), 0);
 
+        if (CurrentAmmo > 0)
+        {
+            CurrentAmmo--;
+            UpdateAmmoGUI();
+        }
     }
 
     private void recoiling()
@@ -137,6 +174,41 @@ public class shootingScript : MonoBehaviour
     {
         transform.localEulerAngles = currentAimingRecoil;
         currentAimingRecoil = Vector3.Lerp(currentAimingRecoil, Vector3.zero, Time.deltaTime * 4);
+    }
+
+    private System.Collections.IEnumerator Reloading()
+    {
+        isAiming = false;
+
+        if (TotalAmmo <= 0)
+        {
+            yield break;
+        }
+
+        isReloading = true;
+
+        yield return new WaitForSeconds(ReloadingTime);
+
+        int AmmoToReload = MaxAmmo - CurrentAmmo;
+        if (TotalAmmo >= AmmoToReload)
+        {
+            CurrentAmmo += AmmoToReload;
+            TotalAmmo -= AmmoToReload;
+        }
+        else
+        {
+            CurrentAmmo += TotalAmmo;
+            TotalAmmo = 0;
+        }
+
+        isReloading = false;
+        UpdateAmmoGUI();
+
+    }
+
+    private void UpdateAmmoGUI()
+    {
+        ammoText.text = $"{CurrentAmmo} / {TotalAmmo}";
     }
 
 }

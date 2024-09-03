@@ -21,6 +21,7 @@ TagManager:
   - Chest
   - JumpPad
   - Battery
+  - MovingWall
   layers:
   - Default
   - TransparentFX
@@ -34,7 +35,7 @@ TagManager:
   - Player
   - Spawner
   - SafeGround
-  - 
+  - MovingWall
   - 
   - 
   - 

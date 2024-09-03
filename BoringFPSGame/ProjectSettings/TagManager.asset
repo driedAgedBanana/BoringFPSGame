@@ -18,6 +18,9 @@ TagManager:
   - RedAid
   - AmmoClip
   - AmmoBox
+  - Chest
+  - JumpPad
+  - Battery
   layers:
   - Default
   - TransparentFX

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InteractionScript : MonoBehaviour
 {
@@ -15,7 +16,8 @@ public class InteractionScript : MonoBehaviour
 
     private enum interactionIconType
     {
-        Interactable, // test
+        JumpPad, 
+        Chest,
         Count // must be placed last
     }
 
@@ -53,11 +55,13 @@ public class InteractionScript : MonoBehaviour
 
             switch (InteractionTag)
             {
-                case "Interactable":
-                    SetIconsActive((int)interactionIconType.Interactable);
+                case "JumpPad":
+                    SetIconsActive((int)interactionIconType.JumpPad);
                     break;
 
-                // Add more if you want to
+                case "Chest":
+                    SetIconsActive((int)interactionIconType.Chest);
+                    break;
 
                 default:
                     setAllIconsInactive();
@@ -66,7 +70,7 @@ public class InteractionScript : MonoBehaviour
         }
         else
         {
-            setAllIconsInactive(); // Ensure icons are turned off when nothing is hit
+            setAllIconsInactive();
         }
     }
 
@@ -76,10 +80,13 @@ public class InteractionScript : MonoBehaviour
 
         switch (tag)
         {
-            case "Interactable":
-                SetIconsActive((int)interactionIconType.Interactable);
+            case "JumpPad":
+                SetIconsActive((int)interactionIconType.JumpPad);
                 break;
-                // Add more interactions in case you need it
+
+            case "Chest":
+                SetIconsActive((int)interactionIconType.Chest);
+                break;
         }
     }
 
@@ -89,8 +96,11 @@ public class InteractionScript : MonoBehaviour
 
         switch (tag)
         {
-            case "Interactable":
-                // Add more tags if needed
+            case "JumpPad":
+                setAllIconsInactive();
+                break;
+
+            case "Chest":
                 setAllIconsInactive();
                 break;
         }

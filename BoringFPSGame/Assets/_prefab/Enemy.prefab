@@ -186,20 +186,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71fb3b8fc9ecdaf44bad1a612a7e8c79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
-  MaxHealth: 7
-  CurrentHealth: 0
-  viewingAngle: 85
-  chaseDistance: 6
   LootTable:
   - itemPrefab: {fileID: 7975998872709633962, guid: b76de77e9e36a1c44b094c10711555eb, type: 3}
     dropChance: 30
   - itemPrefab: {fileID: 3343229072912101299, guid: bf58252b67b807e4eb830e9401bb344d, type: 3}
     dropChance: 15
-  - itemPrefab: {fileID: 7285241698289994806, guid: 7a0c4d296fa47f14a866eff7d831d335, type: 3}
+  - itemPrefab: {fileID: 8827728358068941220, guid: 983ccada41d15c04485d83402f125733, type: 3}
     dropChance: 35
-  - itemPrefab: {fileID: 1944700230332019044, guid: 8651831d087a222469c55e9b0209d42c, type: 3}
-    dropChance: 10
+  - itemPrefab: {fileID: 8375567598395331845, guid: ed771e415cd1e894c96a824f0ec4644d, type: 3}
+    dropChance: 35
+  currentState: 0
+  MaxHealth: 7
+  CurrentHealth: 0
+  viewingAngle: 85
+  chaseDistance: 6
   quickTurnSpeed: 20
   anticipationFactor: 1.5
 --- !u!136 &345395469167473134
@@ -268,7 +268,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9a28fd5bec43f4f44b5a8417c37169c0, type: 2}
+  - {fileID: 2100000, guid: f321a60829d435f4aa95e76cf2619fc0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

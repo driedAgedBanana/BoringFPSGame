@@ -40,8 +40,9 @@ public class PlayerMovementScript : MonoBehaviour
     public float leaningAmount = 20f;
     public float leaningSpeed = 15f;
 
-    [Header("Special for teleportation icon")]
+    [Header("Special for teleportation icon and interaction text")]
     public Image teleportationIcon;
+    public TextMeshProUGUI InteractionText;
 
     [Header("Health Management")]
     public Image HealthBar; // Moved from HealthManagerScript
@@ -54,6 +55,9 @@ public class PlayerMovementScript : MonoBehaviour
     [Header("Flashlight Settings")]
     public Light flashLight;
     public Image batteryIndicator;
+
+    public GameObject FlashlightBattery;
+
     public bool drainOverTime;
     public float maxBrightness;
     public float minBrightness;
@@ -314,10 +318,6 @@ public class PlayerMovementScript : MonoBehaviour
                 flashLight.enabled = !flashLight.enabled;
             }
         }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            replaceBattery(1f);
-        }
     }
 
     //All mechanic for the flashlight
@@ -345,6 +345,11 @@ public class PlayerMovementScript : MonoBehaviour
             Debug.Log("AmmoBox triggered");
             Destroy(other.gameObject);
             Shooting.PickupAmmoBox(60); // Assuming a box gives 60 ammo
+        }
+        else if (other.gameObject.CompareTag("Battery"))
+        {
+            Destroy(other.gameObject);
+            replaceBattery(10f);
         }
         else if (other.gameObject.CompareTag("Teleport"))
         {

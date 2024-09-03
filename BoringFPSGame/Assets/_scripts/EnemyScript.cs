@@ -19,7 +19,7 @@ public class LootTableScript
     [Range(0, 100)] public float dropChance;
 }
 
-public class EnemyScript : MonoBehaviour
+public class EnemyScript : BaseLootDrop
 {
     GameObject player;
     public EnemyState currentState = EnemyState.Wander;
@@ -36,11 +36,8 @@ public class EnemyScript : MonoBehaviour
     private Vector3 lastKnownPlayerPosition;
     private Vector3 hidingSpot;
 
-    [Header("Loot")]
-    public List<LootTableScript> LootTable = new List<LootTableScript>();
-
-    public float quickTurnSpeed = 20f; // Speed at which the enemy turns towards the player
-    public float anticipationFactor = 1.5f; // Factor by which the enemy anticipates the player's movement
+    public float quickTurnSpeed = 20f;
+    public float anticipationFactor = 1.5f;
 
     void Start()
     {
@@ -188,30 +185,7 @@ public class EnemyScript : MonoBehaviour
 
     private void Die()
     {
-        List<LootTableScript> eligibleItems = new List<LootTableScript>();
-
-        foreach (LootTableScript lootItem in LootTable)
-        {
-            if (Random.Range(0f, 100f) <= lootItem.dropChance)
-            {
-                eligibleItems.Add(lootItem);
-            }
-        }
-
-        if (eligibleItems.Count > 0)
-        {
-            LootTableScript chosenItem = eligibleItems[Random.Range(0, eligibleItems.Count)];
-            InstantiateLoot(chosenItem.itemPrefab);
-        }
-
+        DropLoot();
         Destroy(gameObject);
-    }
-
-    void InstantiateLoot(GameObject loot)
-    {
-        if (loot != null)
-        {
-            Instantiate(loot, transform.position, Quaternion.identity);
-        }
     }
 }

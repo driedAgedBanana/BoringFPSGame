@@ -188,13 +188,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LootTable:
   - itemPrefab: {fileID: 7975998872709633962, guid: b76de77e9e36a1c44b094c10711555eb, type: 3}
-    dropChance: 30
-  - itemPrefab: {fileID: 3343229072912101299, guid: bf58252b67b807e4eb830e9401bb344d, type: 3}
-    dropChance: 15
+    dropChance: 25.7
   - itemPrefab: {fileID: 8827728358068941220, guid: 983ccada41d15c04485d83402f125733, type: 3}
-    dropChance: 35
+    dropChance: 26.8
   - itemPrefab: {fileID: 8375567598395331845, guid: ed771e415cd1e894c96a824f0ec4644d, type: 3}
-    dropChance: 35
+    dropChance: 25.7
   currentState: 0
   MaxHealth: 7
   CurrentHealth: 0

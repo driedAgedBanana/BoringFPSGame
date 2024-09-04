@@ -22,6 +22,8 @@ TagManager:
   - JumpPad
   - Battery
   - MovingWall
+  - KeyCard
+  - WallLock
   layers:
   - Default
   - TransparentFX

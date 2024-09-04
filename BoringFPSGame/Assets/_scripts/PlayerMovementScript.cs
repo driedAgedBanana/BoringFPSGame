@@ -56,6 +56,9 @@ public class PlayerMovementScript : MonoBehaviour
     public Light flashLight;
     public Image batteryIndicator;
 
+    [Header("Special for removing wall on getting key card")]
+    public GameObject WallDoor;
+
     public GameObject FlashlightBattery;
 
     public bool drainOverTime;
@@ -333,25 +336,24 @@ public class PlayerMovementScript : MonoBehaviour
             Debug.LogError("Shooting is null");
             return;
         }
-
         if (other.gameObject.CompareTag("AmmoClip"))
         {
             Debug.Log("AmmoClip triggered");
             Destroy(other.gameObject);
             Shooting.PickupAmmoClip(10); // Assuming a clip gives 10 ammo
         }
-        else if (other.gameObject.CompareTag("AmmoBox"))
+        if (other.gameObject.CompareTag("AmmoBox"))
         {
             Debug.Log("AmmoBox triggered");
             Destroy(other.gameObject);
             Shooting.PickupAmmoBox(60); // Assuming a box gives 60 ammo
         }
-        else if (other.gameObject.CompareTag("Battery"))
+        if (other.gameObject.CompareTag("Battery"))
         {
             Destroy(other.gameObject);
             replaceBattery(10f);
         }
-        else if (other.gameObject.CompareTag("Teleport"))
+        if (other.gameObject.CompareTag("Teleport"))
         {
             if (teleportationIcon != null)
             {
@@ -384,6 +386,11 @@ public class PlayerMovementScript : MonoBehaviour
         {
             Destroy(collision.gameObject);
             Healing(30);
+        }
+        if(collision.gameObject.CompareTag("KeyCard"))
+        {
+            Destroy(collision.gameObject);
+            Destroy(WallDoor);
         }
     }
 

@@ -9,7 +9,7 @@ public class PlayerMovementScript : MonoBehaviour
 {
     private shootingScript Shooting;
 
-    private float healthAmount = 100f;
+    public float healthAmount = 100f;
 
     [Header("Movement Speed")]
     public float speed = 5f;
@@ -111,7 +111,7 @@ public class PlayerMovementScript : MonoBehaviour
         Movement();
         leaningMoment();
         camMovement();
-        HandleCrouch();
+        //HandleCrouch();
         handleFlashlight();
     }
 
@@ -163,44 +163,44 @@ public class PlayerMovementScript : MonoBehaviour
 
     #region it's a nightmare
 
-    private void HandleCrouch()
-    {
-        Vector3 rayOrigin = transform.position;
-        Vector3 rayDirection = Vector3.up;
+    //private void HandleCrouch()
+    //{
+    //    Vector3 rayOrigin = transform.position;
+    //    Vector3 rayDirection = Vector3.up;
 
-        float rayLength = 3f; // Adjust this length if needed
+    //    float rayLength = 3f; // Adjust this length if needed
 
-        // Perform the raycast to check for obstacles above the player
-        bool isObstructed = Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, rayLength);
+    //    // Perform the raycast to check for obstacles above the player
+    //    bool isObstructed = Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, rayLength);
 
-        // Draw the ray for visualization
-        Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.yellow);
+    //    // Draw the ray for visualization
+    //    Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.yellow);
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if (isCrouching)
-            {
-                if (crouchRoutine != null) StopCoroutine(crouchRoutine);
-                if (!isObstructed) // Only stand up if not obstructed
-                {
-                    crouchRoutine = StartCoroutine(SmoothStandUp());
-                    HideWarningText(); // Hide warning message
-                }
-                else
-                {
-                    Debug.Log("Cannot stand up, obstruction detected!");
-                    if (warningRoutine != null) StopCoroutine(warningRoutine);
-                    warningRoutine = StartCoroutine(DisplayWarning("Cannot stand up here!")); // Show warning message
-                }
-            }
-            else
-            {
-                if (crouchRoutine != null) StopCoroutine(crouchRoutine);
-                crouchRoutine = StartCoroutine(SmoothCrouch());
-                HideWarningText(); // Hide warning message when crouching
-            }
-        }
-    }
+    //    if (Input.GetKeyDown(KeyCode.C))
+    //    {
+    //        if (isCrouching)
+    //        {
+    //            if (crouchRoutine != null) StopCoroutine(crouchRoutine);
+    //            if (!isObstructed) // Only stand up if not obstructed
+    //            {
+    //                crouchRoutine = StartCoroutine(SmoothStandUp());
+    //                HideWarningText(); // Hide warning message
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("Cannot stand up, obstruction detected!");
+    //                if (warningRoutine != null) StopCoroutine(warningRoutine);
+    //                warningRoutine = StartCoroutine(DisplayWarning("Cannot stand up here!")); // Show warning message
+    //            }
+    //        }
+    //        else
+    //        {
+    //            if (crouchRoutine != null) StopCoroutine(crouchRoutine);
+    //            crouchRoutine = StartCoroutine(SmoothCrouch());
+    //            HideWarningText(); // Hide warning message when crouching
+    //        }
+    //    }
+    //}
 
     private IEnumerator DisplayWarning(string message)
     {

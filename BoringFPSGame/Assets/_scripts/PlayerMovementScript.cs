@@ -99,6 +99,8 @@ public class PlayerMovementScript : MonoBehaviour
 
         batteryIndicator.fillAmount = flashLight.intensity / maxBrightness;
 
+        flashLight.enabled = false;
+
         Shooting = gameObject.GetComponentInChildren<shootingScript>();
         if (Shooting == null)
         {

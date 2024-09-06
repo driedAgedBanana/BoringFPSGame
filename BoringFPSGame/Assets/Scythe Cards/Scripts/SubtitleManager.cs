@@ -9,33 +9,28 @@ namespace Scythe.Accessibility
 {
     public class SubtitleManager : MonoBehaviour
     {
-
-        // instance definition
         public static SubtitleManager instance;
 
-        // reference to our subtitle text object
-        [Tooltip("The text used for the subtitles, can be any text object")] [SerializeField] public TextMeshProUGUI subtitleText;
+        [Tooltip("The text used for the subtitles, can be any text object")]
+        [SerializeField] public TextMeshProUGUI subtitleText;
 
-        // optional functionality if we want to interrupt subtitles 
-        [Tooltip("If false, does not interrupt the current playing subtitle")] public bool subtitlesInterrupt;
+        [Tooltip("If false, does not interrupt the current playing subtitle")]
+        public bool subtitlesInterrupt;
 
-        // throwaway variables
         private Coroutine _subControl;
         private bool _subtitleSequenceRunning;
 
-        // for additional functionality, if needed :)
         public UnityEvent BeforeSubtitleBegins;
         public UnityEvent OnSubtitleFinished;
-
 
         void Awake()
         {
             instance = this;
         }
 
-        public void CueSubtitle(SubtitleCard subCard)
+        public void CueSubtitle(SubtitleCard subCard, AudioClip[] audioClips)
         {
-            if(!subtitlesInterrupt && _subtitleSequenceRunning)
+            if (!subtitlesInterrupt && _subtitleSequenceRunning)
             {
                 return;
             }
@@ -46,25 +41,37 @@ namespace Scythe.Accessibility
                     StopCoroutine(_subControl);
                 }
             }
-            _subControl = StartCoroutine(SubtitleControl(subCard));
+            _subControl = StartCoroutine(SubtitleControl(subCard, audioClips));
         }
 
-        IEnumerator SubtitleControl(SubtitleCard subCard)
+        IEnumerator SubtitleControl(SubtitleCard subCard, AudioClip[] audioClips)
         {
-            BeforeSubtitleBegins.Invoke(); // for additional functionality, if needed :)
+            BeforeSubtitleBegins.Invoke();
             _subtitleSequenceRunning = true;
+
             for (int i = 0; i < subCard.dialogue.Length; i++)
             {
                 subtitleText.text = subCard.dialogue[i];
+
+                // Play the corresponding audio clip for the current dialogue line
+                if (i < audioClips.Length)
+                {
+                    AudioManager.instance.PlayAudioClip(audioClips[i]);
+                }
+
+                // Wait for the audio to finish playing
+                while (AudioManager.instance.IsAudioPlaying())
+                {
+                    yield return null;
+                }
+
                 yield return new WaitForSeconds(subCard.pauseUntilNextLine[i]);
             }
+
             subtitleText.text = "";
             _subtitleSequenceRunning = false;
-            OnSubtitleFinished.Invoke(); // for additional functionality, if needed :)
+            OnSubtitleFinished.Invoke();
             Debug.Log("Subtitle Sequence finished");
         }
     }
 }
-
-// The subtitle manager is a singleton instance so we can call it from any script.
-

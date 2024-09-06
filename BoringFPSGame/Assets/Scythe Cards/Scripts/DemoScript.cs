@@ -5,9 +5,34 @@ using Scythe.Accessibility.Data;
 public class DemoScript : MonoBehaviour
 {
     [SerializeField] SubtitleCard subtitleCard;
-    void Start()
+    [SerializeField] AudioClip[] audioClips;
+
+    public bool isPlayerInTriggerZone = false;
+
+    void Update()
     {
-        SubtitleManager.instance.CueSubtitle(subtitleCard);
+        if (isPlayerInTriggerZone)
+        {
+            SubtitleManager.instance.CueSubtitle(subtitleCard, audioClips);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInTriggerZone = true;
+            Debug.Log("Player entered trigger zone");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInTriggerZone = false;
+            Debug.Log("Player exited trigger zone");
+        }
     }
 
 }

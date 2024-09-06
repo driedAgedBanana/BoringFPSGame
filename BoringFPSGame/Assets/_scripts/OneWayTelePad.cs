@@ -12,6 +12,8 @@ public class ImmadiateTeleportation : MonoBehaviour
     public AudioClip audioSource;
     private AudioSource teleportingSFX;
 
+    [SerializeField] private RadioManager radio;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +34,8 @@ public class ImmadiateTeleportation : MonoBehaviour
 
                 playerObj.transform.position = teleportationDestination.transform.position;
                 teleportingSFX.Play();
+
+                radio.StopMusic();
             }
         }
         else

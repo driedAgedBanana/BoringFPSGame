@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3a3862f033831f45ba9ac8336b94e8a, type: 3}
   m_Name: NewSubtitle
   m_EditorClassIdentifier: 
-  dialogue: []
-  pauseUntilNextLine: []
+  dialogue:
+  - Warning, warning. This is not a test.
+  pauseUntilNextLine:
+  - 0.4

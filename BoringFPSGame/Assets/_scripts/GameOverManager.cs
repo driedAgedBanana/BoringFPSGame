@@ -28,22 +28,21 @@ public class GameOverManager : MonoBehaviour
         checkingOnPlayersHealth();
     }
 
-    private void checkingOnPlayersHealth()
+    public void checkingOnPlayersHealth()
     {
         if (PMS != null && PMS.healthAmount <= 0)
         {
-            triggerGameOverPanel();
+            TriggerGameOverPanel();
             Debug.Log("Player should die!");
         }
     }
 
-    private void triggerGameOverPanel()
+   public void TriggerGameOverPanel()
     {
-        playerHUD.enabled = false;
         gameOverHUD.enabled = true;
+        playerHUD.enabled = false;
 
-        PMS.enabled = false;
-        Destroy(PMS.gameObject);
+        Time.timeScale = 0;
 
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         UnityEngine.Cursor.visible = true;

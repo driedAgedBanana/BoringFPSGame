@@ -84,6 +84,8 @@ public class PlayerMovementScript : MonoBehaviour
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         UnityEngine.Cursor.visible = false;
 
+        Time.timeScale = 1f;
+
         rb = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
         playerCollider = GetComponentInChildren<CapsuleCollider>();
@@ -102,6 +104,8 @@ public class PlayerMovementScript : MonoBehaviour
         flashLight.enabled = false;
 
         Shooting = gameObject.GetComponentInChildren<shootingScript>();
+
+
         if (Shooting == null)
         {
             Debug.LogError("Shooting script not found on the GameObject.");
@@ -141,7 +145,7 @@ public class PlayerMovementScript : MonoBehaviour
             isCrouching = false;
             MovementInput *= sprintSpeed;
             if (crouchRoutine != null) StopCoroutine(crouchRoutine);
-            crouchRoutine = StartCoroutine(SmoothStandUp());
+            //crouchRoutine = StartCoroutine(SmoothStandUp());
         }
         else if (isCrouching)
         {
@@ -204,82 +208,82 @@ public class PlayerMovementScript : MonoBehaviour
     //    }
     //}
 
-    private IEnumerator DisplayWarning(string message)
-    {
-        warningText.text = message;
-        warningText.gameObject.SetActive(true); // Make sure the text is active
+    //private IEnumerator DisplayWarning(string message)
+    //{
+    //    warningText.text = message;
+    //    warningText.gameObject.SetActive(true); // Make sure the text is active
 
-        // Fade in
-        Color textColor = warningText.color;
-        for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
-        {
-            textColor.a = Mathf.Lerp(0, 1, t);
-            warningText.color = textColor;
-            yield return null;
-        }
-        textColor.a = 1;
-        warningText.color = textColor;
+    //    // Fade in
+    //    Color textColor = warningText.color;
+    //    for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
+    //    {
+    //        textColor.a = Mathf.Lerp(0, 1, t);
+    //        warningText.color = textColor;
+    //        yield return null;
+    //    }
+    //    textColor.a = 1;
+    //    warningText.color = textColor;
 
-        // Wait for 3 seconds
-        yield return new WaitForSeconds(3f);
+    //    // Wait for 3 seconds
+    //    yield return new WaitForSeconds(3f);
 
-        // Fade out
-        for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
-        {
-            textColor.a = Mathf.Lerp(1, 0, t);
-            warningText.color = textColor;
-            yield return null;
-        }
-        textColor.a = 0;
-        warningText.color = textColor;
+    //    // Fade out
+    //    for (float t = 0; t <= 1; t += Time.deltaTime / 0.5f) // Adjust duration as needed
+    //    {
+    //        textColor.a = Mathf.Lerp(1, 0, t);
+    //        warningText.color = textColor;
+    //        yield return null;
+    //    }
+    //    textColor.a = 0;
+    //    warningText.color = textColor;
 
-        warningText.gameObject.SetActive(false); // Deactivate text after fading out
-    }
+    //    warningText.gameObject.SetActive(false); // Deactivate text after fading out
+    //}
 
-    private void HideWarningText()
-    {
-        if (warningText != null)
-        {
-            warningText.gameObject.SetActive(false); // Hide the text immediately
-        }
-    }
+    //private void HideWarningText()
+    //{
+    //    if (warningText != null)
+    //    {
+    //        warningText.gameObject.SetActive(false); // Hide the text immediately
+    //    }
+    //}
 
-    private IEnumerator SmoothCrouch()
-    {
-        isCrouching = true;
-        float elapsedTime = 0f;
-        Vector3 targetCamPos = new Vector3(originalCamPos.x, originalCamPos.y - crouchCamPosOffset, originalCamPos.z);
-        float targetHeight = crouchHeight;
+    //private IEnumerator SmoothCrouch()
+    //{
+    //    isCrouching = true;
+    //    float elapsedTime = 0f;
+    //    Vector3 targetCamPos = new Vector3(originalCamPos.x, originalCamPos.y - crouchCamPosOffset, originalCamPos.z);
+    //    float targetHeight = crouchHeight;
 
-        while (elapsedTime < crouchTransitionSpeed)
-        {
-            playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
-            cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, targetCamPos, (elapsedTime / crouchTransitionSpeed));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
+    //    while (elapsedTime < crouchTransitionSpeed)
+    //    {
+    //        playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
+    //        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, targetCamPos, (elapsedTime / crouchTransitionSpeed));
+    //        elapsedTime += Time.deltaTime;
+    //        yield return null;
+    //    }
 
-        playerCollider.height = targetHeight;
-        cam.transform.localPosition = targetCamPos;
-    }
+    //    playerCollider.height = targetHeight;
+    //    cam.transform.localPosition = targetCamPos;
+    //}
 
-    private IEnumerator SmoothStandUp()
-    {
-        isCrouching = false;
-        float elapsedTime = 0f;
-        float targetHeight = originalHeight;
+    //private IEnumerator SmoothStandUp()
+    //{
+    //    isCrouching = false;
+    //    float elapsedTime = 0f;
+    //    float targetHeight = originalHeight;
 
-        while (elapsedTime < crouchTransitionSpeed)
-        {
-            playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
-            cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPos, (elapsedTime / crouchTransitionSpeed));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
+    //    while (elapsedTime < crouchTransitionSpeed)
+    //    {
+    //        playerCollider.height = Mathf.Lerp(playerCollider.height, targetHeight, (elapsedTime / crouchTransitionSpeed));
+    //        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPos, (elapsedTime / crouchTransitionSpeed));
+    //        elapsedTime += Time.deltaTime;
+    //        yield return null;
+    //    }
 
-        playerCollider.height = targetHeight;
-        cam.transform.localPosition = originalCamPos;
-    }
+    //    playerCollider.height = targetHeight;
+    //    cam.transform.localPosition = originalCamPos;
+    //}
 
     #endregion
 

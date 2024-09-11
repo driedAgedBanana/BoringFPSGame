@@ -4827,7 +4827,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 463405373666715049, guid: 6c39976871e7f9946a80c22910ab5763, type: 3}
       propertyPath: m_Range
-      value: 13.79
+      value: 84.5
       objectReference: {fileID: 0}
     - target: {fileID: 463405373666715049, guid: 6c39976871e7f9946a80c22910ab5763, type: 3}
       propertyPath: m_Intensity
@@ -11610,7 +11610,7 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 32.7
+  m_Intensity: 10.68
   m_Range: 196
   m_SpotAngle: 179
   m_InnerSpotAngle: 21.80208

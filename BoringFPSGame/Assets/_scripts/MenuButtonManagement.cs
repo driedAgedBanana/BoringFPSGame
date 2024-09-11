@@ -26,4 +26,9 @@ public class MenuButtonManagement : MonoBehaviour
     {
         SceneManager.LoadScene("Playground 1");
     }
+
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("MenuScene");
+    }
 }

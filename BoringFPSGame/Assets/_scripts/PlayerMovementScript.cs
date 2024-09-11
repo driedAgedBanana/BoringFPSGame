@@ -344,7 +344,7 @@ public class PlayerMovementScript : MonoBehaviour
         }
         if (other.gameObject.CompareTag("AmmoClip"))
         {
-            Debug.Log("AmmoClip triggered");
+            Debug.Log("AmmoMagazine triggered");
             Destroy(other.gameObject);
             Shooting.PickupAmmoClip(10); // Assuming a clip gives 10 ammo
         }

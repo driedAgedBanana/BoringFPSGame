@@ -46,6 +46,10 @@ public class PlayerMovementScript : MonoBehaviour
     [Header("Health Management")]
     public Image HealthBar; // Health bar UI element
 
+    [Header("Special for Music Entertainment")]
+    private RadioManager Radio;
+    public TextMeshProUGUI MusicLists;
+
     [Header("For ammo and munitions")]
     public GameObject ammoClip; // Ammo clip prefab
     public GameObject ammoBox; // Ammo box prefab
@@ -96,6 +100,8 @@ public class PlayerMovementScript : MonoBehaviour
         originalHeight = playerCollider.height; // Store original collider height
         originalCamPos = cam.transform.localPosition; // Store original camera position
 
+        Radio = GetComponent<RadioManager>();
+
         // Initialize health-related UI
         HealthBar.fillAmount = healthAmount / 100; // Set health bar fill based on healthAmount
 
@@ -118,6 +124,15 @@ public class PlayerMovementScript : MonoBehaviour
         camMovement(); // Handle camera movement
         //HandleCrouch(); // Handle crouching, commented out
         handleFlashlight(); // Handle flashlight behavior
+        onMusicPlayListDisplay();
+    }
+
+    private void onMusicPlayListDisplay()
+    {
+        if (Radio != null && Radio.audioSource.clip != null)
+        {
+            MusicLists.text = "Now Playing: " + Radio.audioSource.clip.name; // Update HUD
+        }
     }
 
     private void camMovement()

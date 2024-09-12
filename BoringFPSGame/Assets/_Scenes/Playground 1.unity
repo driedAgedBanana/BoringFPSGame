@@ -6209,6 +6209,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3a76c2f83ce2878478233eca697effd4, type: 3}
   - {fileID: 8300000, guid: 6bc21c7c7fb1a384ea606cb45dead2ff, type: 3}
   - {fileID: 8300000, guid: 6f83502b76460ef47a95fc7488096c45, type: 3}
+  - {fileID: 8300000, guid: d24e446ad715fe648ba5534779981b4d, type: 3}
+  - {fileID: 8300000, guid: a7aeb39f68a508f42be81e46aec61d98, type: 3}
+  - {fileID: 8300000, guid: cf8bc3858602de84cbc8345c946dc021, type: 3}
+  - {fileID: 8300000, guid: 5e158aac66b241d4bb531f8bd17d96b9, type: 3}
+  - {fileID: 8300000, guid: 7a85bb04bd529db43b25741d6630fb58, type: 3}
+  - {fileID: 8300000, guid: ea5e7dee25bfcde48b1f75f7c2f6e45a, type: 3}
   interactionDistance: 3
   isRadioOn: 0
 --- !u!1001 &777542108

@@ -129,7 +129,6 @@ GameObject:
   - component: {fileID: 585324430919094430}
   - component: {fileID: 1056629729768118731}
   - component: {fileID: 7382854201737889847}
-  - component: {fileID: 740568044895369844}
   m_Layer: 0
   m_Name: PlayerObj 1
   m_TagString: Player
@@ -178,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39bb5cbc94d3b14488016f9101c6d482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthAmount: 100
   speed: 7
   sprintSpeed: 15
   crouchSpeed: 5
@@ -191,9 +191,14 @@ MonoBehaviour:
   leaningAmount: 14
   leaningSpeed: 15
   teleportationIcon: {fileID: 996292400379322748}
+  InteractionText: {fileID: 0}
   HealthBar: {fileID: 6634756600771114473}
+  ammoClip: {fileID: 0}
+  ammoBox: {fileID: 0}
   flashLight: {fileID: 1443490019686658839}
   batteryIndicator: {fileID: 8410427816955928794}
+  WallDoor: {fileID: 0}
+  FlashlightBattery: {fileID: 0}
   drainOverTime: 1
   maxBrightness: 9
   minBrightness: 0
@@ -329,29 +334,6 @@ MonoBehaviour:
   rayLength: 3.3
   interactionIcons:
   - {fileID: 1970032190064341340}
---- !u!114 &740568044895369844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 590916124729607836}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4299d267e38c99d4b80cff2cef624d38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orientation: {fileID: 6369661686333449118}
-  wallDistance: 1
-  minimumJumpHeight: 1.5
-  wallRunGravity: 1
-  wallRunJumpForce: 6
-  cam: {fileID: 2684044688770534781}
-  fov: 90
-  wallRunfov: 100
-  wallRunfovTime: 20
-  camTilt: 20
-  camTiltTime: 20
 --- !u!1 &660687237394205088
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,6 +1739,8 @@ MonoBehaviour:
   TotalAmmo: 160
   ReloadingTime: 1.1
   ammoText: {fileID: 2278869512577539935}
+  ammoClip: {fileID: 0}
+  ammoBox: {fileID: 0}
   SFX: {fileID: 8300000, guid: 85706d8bf5f54c240bf000bf13367ed9, type: 3}
   ReloadSFX: {fileID: 8300000, guid: 22ae2cbfcf287f4449328818e1d0a2b8, type: 3}
   weapon: {fileID: 1369180308658918471}
